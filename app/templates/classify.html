@@ -1,0 +1,21 @@
+
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %}
+
+{% block title %}Classify Intents Survey - Classify{% endblock %}
+
+{% block page_content %}
+<div>
+    <h2>Survey:</h2>
+    {% if survey.box1 %}
+    <h5 class='survey_question'>Question 1:</h5>
+    <p>{{ survey.box1 | safe }}</p>
+    <h5 class='survey_question'>Question 2:</h5>
+    <p>{{ survey.box2 | safe }}</p>
+    <h5 class='survey_question'>Question 3:</h5>
+    <p>{{ survey.box3 | safe }}</p>
+    {% endif %}
+</div>
+{{ wtf.quick_form(form) }}
+{% endblock %}

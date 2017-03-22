@@ -1,11 +1,9 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, BooleanField, SelectField,\
-    SubmitField
+from wtforms import StringField, TextAreaField, BooleanField, SelectField, SubmitField, RadioField
 from wtforms.validators import Required, Length, Email, Regexp
 from wtforms import ValidationError
 from flask_pagedown.fields import PageDownField
-from ..models import Role, User
-
+from ..models import Role, User, Codes, ProjectCodes, Classified
 
 class NameForm(FlaskForm):
     name = StringField('What is your name?', validators=[Required()])
@@ -49,12 +47,32 @@ class EditProfileAdminForm(FlaskForm):
                 User.query.filter_by(username=field.data).first():
             raise ValidationError('Username already in use.')
 
+class ClassifyForm(FlaskForm):
+    code = RadioField('code_radio', coerce=int, validators=[Required()])
 
-class PostForm(FlaskForm):
-    body = PageDownField("What's on your mind?", validators=[Required()])
+    # Default the project code to 1, which should correspond to 'none'
+    # Better solution would be to determine this dynamically.
+    # Using ProjectCode.query.filter_by(project_code='none').first()
+
+    project_code = RadioField('project_code_radio', coerce=int, default='1', validators=[Required()])
+
+    PII_boolean = BooleanField('PII_boolean')
+
     submit = SubmitField('Submit')
 
+    @classmethod
+    def codes(cls):
+        codes_form = cls()
 
-class CommentForm(FlaskForm):
-    body = StringField('Enter your comment', validators=[Required()])
-    submit = SubmitField('Submit')
+        # Extract codes from Postgres
+
+        codes = Codes.query.all()
+        codes_form.code.choices = [(g.code_id, g.code) for g in codes]
+        
+        # Extract project_codes from Postgres
+
+        project_codes = ProjectCodes.query.all()
+        codes_form.project_code.choices = [(i.project_code_id, i.project_code) for i in project_codes]
+
+        return(codes_form)
+

@@ -40,3 +40,7 @@ nosetests.xml
 
 # Virtual environment
 venv
+.env
+*.swp
+include/
+pip-selfcheck.json

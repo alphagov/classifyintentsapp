@@ -8,7 +8,7 @@ from flask import current_app, request, url_for
 from flask_login import UserMixin, AnonymousUserMixin
 from app.exceptions import ValidationError
 from . import db, login_manager
-
+from random import choice
 
 class Permission:
     FOLLOW = 0x01
@@ -51,20 +51,11 @@ class Role(db.Model):
         return '<Role %r>' % self.name
 
 
-class Follow(db.Model):
-    __tablename__ = 'follows'
-    follower_id = db.Column(db.Integer, db.ForeignKey('users.id'),
-                            primary_key=True)
-    followed_id = db.Column(db.Integer, db.ForeignKey('users.id'),
-                            primary_key=True)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-
-
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(64), unique=True, index=True)
-    username = db.Column(db.String(64), unique=True, index=True)
+    username = db.Column(db.String(64), index=True)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     password_hash = db.Column(db.String(128))
     confirmed = db.Column(db.Boolean, default=False)
@@ -74,18 +65,7 @@ class User(UserMixin, db.Model):
     member_since = db.Column(db.DateTime(), default=datetime.utcnow)
     last_seen = db.Column(db.DateTime(), default=datetime.utcnow)
     avatar_hash = db.Column(db.String(32))
-    posts = db.relationship('Post', backref='author', lazy='dynamic')
-    followed = db.relationship('Follow',
-                               foreign_keys=[Follow.follower_id],
-                               backref=db.backref('follower', lazy='joined'),
-                               lazy='dynamic',
-                               cascade='all, delete-orphan')
-    followers = db.relationship('Follow',
-                                foreign_keys=[Follow.followed_id],
-                                backref=db.backref('followed', lazy='joined'),
-                                lazy='dynamic',
-                                cascade='all, delete-orphan')
-    comments = db.relationship('Comment', backref='author', lazy='dynamic')
+    classified = db.relationship('Classified', backref='user_classified', lazy='dynamic')
 
     @staticmethod
     def generate_fake(count=100):
@@ -109,14 +89,6 @@ class User(UserMixin, db.Model):
             except IntegrityError:
                 db.session.rollback()
 
-    @staticmethod
-    def add_self_follows():
-        for user in User.query.all():
-            if not user.is_following(user):
-                user.follow(user)
-                db.session.add(user)
-                db.session.commit()
-
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
         if self.role is None:
@@ -127,7 +99,6 @@ class User(UserMixin, db.Model):
         if self.email is not None and self.avatar_hash is None:
             self.avatar_hash = hashlib.md5(
                 self.email.encode('utf-8')).hexdigest()
-        self.followed.append(Follow(followed=self))
 
     @property
     def password(self):
@@ -216,39 +187,12 @@ class User(UserMixin, db.Model):
         return '{url}/{hash}?s={size}&d={default}&r={rating}'.format(
             url=url, hash=hash, size=size, default=default, rating=rating)
 
-    def follow(self, user):
-        if not self.is_following(user):
-            f = Follow(follower=self, followed=user)
-            db.session.add(f)
-
-    def unfollow(self, user):
-        f = self.followed.filter_by(followed_id=user.id).first()
-        if f:
-            db.session.delete(f)
-
-    def is_following(self, user):
-        return self.followed.filter_by(
-            followed_id=user.id).first() is not None
-
-    def is_followed_by(self, user):
-        return self.followers.filter_by(
-            follower_id=user.id).first() is not None
-
-    @property
-    def followed_posts(self):
-        return Post.query.join(Follow, Follow.followed_id == Post.author_id)\
-            .filter(Follow.follower_id == self.id)
-
     def to_json(self):
         json_user = {
             'url': url_for('api.get_user', id=self.id, _external=True),
             'username': self.username,
             'member_since': self.member_since,
-            'last_seen': self.last_seen,
-            'posts': url_for('api.get_user_posts', id=self.id, _external=True),
-            'followed_posts': url_for('api.get_user_followed_posts',
-                                      id=self.id, _external=True),
-            'post_count': self.posts.count()
+            'last_seen': self.last_seen
         }
         return json_user
 
@@ -284,101 +228,213 @@ login_manager.anonymous_user = AnonymousUser
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+class Classified(db.Model):
+    __tablename__ = 'classified'
+    classified_id = db.Column(db.Integer(), primary_key=True, index=True)
+    respondent_id = db.Column(db.BigInteger(), db.ForeignKey('raw.respondent_id')) 
+    coder_id = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=False)
+    code_id = db.Column(db.Integer(), db.ForeignKey('codes.code_id'), nullable=False)
+    project_code_id = db.Column(db.Integer(), db.ForeignKey('project_codes.project_code_id')) 
+    pip = db.Column(db.Boolean())
+    date_coded = db.Column(db.DateTime(), nullable=False)
 
-class Post(db.Model):
-    __tablename__ = 'posts'
-    id = db.Column(db.Integer, primary_key=True)
-    body = db.Column(db.Text)
-    body_html = db.Column(db.Text)
-    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    comments = db.relationship('Comment', backref='post', lazy='dynamic')
+    @staticmethod
+    def generate_fake(count=1000):
+        from sqlalchemy.exc import IntegrityError
+        from random import seed, randint, choice
+        import forgery_py
+
+        seed()
+
+        raw_query = Raw.query.all()
+        codes_query = Codes.query.all()
+        project_codes_query = ProjectCodes.query.all()
+        user_query = User.query.all()
+
+        r_ids = [i.respondent_id for i in raw_query]
+        c_ids = [i.code_id for i in codes_query]
+        pc_ids = [i.project_code_id for i in project_codes_query]
+        u_ids = [i.id for i in user_query]
+            
+        for i in range(count):
+            r = Classified(
+                respondent_id = choice(r_ids),
+                coder_id = choice(u_ids),
+                code_id = choice(c_ids),
+                project_code_id = choice(pc_ids),
+                pip = choice(['Yes','No']),
+                date_coded = forgery_py.date.date(True),
+                )
+
+            db.session.add(r)
+            try:
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
+    
+    def __repr__(self):
+        return '<respondent_id %r>' % self.respondent_id
+
+
+    #def __repr__(self):
+    #    return '<respondent_id %r>' % self.respondent_id
+
+class Raw(db.Model):
+    __tablename__ = 'raw'
+    respondent_id = db.Column(db.BigInteger(), primary_key=True, index=True)
+    collector_id = db.Column(db.BigInteger())
+    start_date = db.Column(db.DateTime(), index=True)
+    end_date = db.Column(db.DateTime(), index=True)
+    ip_address = db.Column(db.String())
+    email_address = db.Column(db.String())
+    first_name = db.Column(db.String())
+    last_name = db.Column(db.String())
+    full_url = db.Column(db.String())
+    cat_work_or_personal =  db.Column(db.String(20))
+    comment_what_work = db.Column(db.String())
+    comment_why_you_came = db.Column(db.String())
+    cat_found_looking_for = db.Column(db.String(20))
+    comment_other_found_what = db.Column(db.String())
+    cat_satisfaction = db.Column(db.String(50))
+    comment_other_where_for_help = db.Column(db.String())
+    cat_anywhere_else_help = db.Column(db.String(30))
+    comment_other_else_help = db.Column(db.String())
+    comment_where_for_help = db.Column(db.String())
+    comment_further_comments = db.Column(db.String())
+    classified = db.relationship('Classified', backref='surveys_classified', lazy='dynamic')
 
     @staticmethod
     def generate_fake(count=100):
+        from sqlalchemy.exc import IntegrityError
+        from random import seed, randint, choice
+        import forgery_py
+
+        seed()
+        for i in range(count):
+            r = Raw(
+                respondent_id = randint(10000000, 50000000),
+                collector_id = 999999,
+                start_date = forgery_py.date.date(True),
+                end_date = forgery_py.date.date(True),
+                ip_address = '',
+                email_address = '',
+                first_name = '',
+                last_name = '',
+                full_url = forgery_py.internet.domain_name(),
+                cat_work_or_personal = forgery_py.lorem_ipsum.word(),
+                comment_what_work = forgery_py.lorem_ipsum.words(3),
+                comment_why_you_came = forgery_py.lorem_ipsum.sentences(2),
+                cat_found_looking_for = choice(['Yes','No']),
+                comment_other_found_what = forgery_py.lorem_ipsum.sentences(2),
+                cat_satisfaction = choice(['Very','Not Very']),
+                comment_other_where_for_help = forgery_py.lorem_ipsum.sentences(2),
+                cat_anywhere_else_help = choice(['Yes','No']),
+                comment_other_else_help = forgery_py.lorem_ipsum.sentence(),
+                comment_where_for_help = forgery_py.lorem_ipsum.sentence(),
+                comment_further_comments = forgery_py.lorem_ipsum.sentences(3)  
+                )
+
+            db.session.add(r)
+            try:
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
+    
+    def __repr__(self):
+        return '<respondent_id %r>' % self.respondent_id
+
+class Codes(db.Model):
+    __tablename__ = 'codes'
+    code_id = db.Column(db.Integer(), primary_key=True)
+    code = db.Column(db.String(50))
+    description = db.Column(db.String())
+    start_date = db.Column(db.DateTime())
+    end_date = db.Column(db.DateTime())
+    classified = db.relationship('Classified', backref='code_surveys', lazy='dynamic')
+
+    @staticmethod
+    def generate_fake(count=10):
+        from sqlalchemy.exc import IntegrityError
         from random import seed, randint
         import forgery_py
 
         seed()
-        user_count = User.query.count()
-        for i in range(count):
-            u = User.query.offset(randint(0, user_count - 1)).first()
-            p = Post(body=forgery_py.lorem_ipsum.sentences(randint(1, 5)),
-                     timestamp=forgery_py.date.date(True),
-                     author=u)
-            db.session.add(p)
+
+# Add a 'none' class to ensure the default value in the form 
+# works as expected
+
+        r = Codes(
+            code='none',
+            description='none',
+            start_date=forgery_py.date.date(True),
+            end_date=forgery_py.date.date(True)
+            )
+
+        db.session.add(r)
+        try:
             db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+
+        for i in range(count):
+            r = Codes(
+                code=forgery_py.lorem_ipsum.word(),
+                description=forgery_py.lorem_ipsum.sentence(),
+                start_date=forgery_py.date.date(True),
+                end_date=forgery_py.date.date(True)
+                )
+
+            db.session.add(r)
+            try:
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
+    
+
+class ProjectCodes(db.Model):
+    __tablename__ = 'project_codes'
+    project_code_id = db.Column(db.Integer(), primary_key=True)
+    project_code = db.Column(db.String(50))
+    description = db.Column(db.String())
+    start_date = db.Column(db.DateTime())
+    end_date = db.Column(db.DateTime())
+    classified = db.relationship('Classified', backref='project_surveys', lazy='dynamic')
 
     @staticmethod
-    def on_changed_body(target, value, oldvalue, initiator):
-        allowed_tags = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code',
-                        'em', 'i', 'li', 'ol', 'pre', 'strong', 'ul',
-                        'h1', 'h2', 'h3', 'p']
-        target.body_html = bleach.linkify(bleach.clean(
-            markdown(value, output_format='html'),
-            tags=allowed_tags, strip=True))
+    def generate_fake(count=3):
+        from sqlalchemy.exc import IntegrityError
+        from random import seed, randint
+        import forgery_py
 
-    def to_json(self):
-        json_post = {
-            'url': url_for('api.get_post', id=self.id, _external=True),
-            'body': self.body,
-            'body_html': self.body_html,
-            'timestamp': self.timestamp,
-            'author': url_for('api.get_user', id=self.author_id,
-                              _external=True),
-            'comments': url_for('api.get_post_comments', id=self.id,
-                                _external=True),
-            'comment_count': self.comments.count()
-        }
-        return json_post
+        seed()
+ 
+# Add a 'none' class to ensure the default value in the form 
+# works as expected
 
-    @staticmethod
-    def from_json(json_post):
-        body = json_post.get('body')
-        if body is None or body == '':
-            raise ValidationError('post does not have a body')
-        return Post(body=body)
+        r = ProjectCodes(
+            project_code='none',
+            description='none',
+            start_date=forgery_py.date.date(True),
+            end_date=forgery_py.date.date(True)
+            )
 
+        db.session.add(r)
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+ 
+        for i in range(count):
+            r = ProjectCodes(
+                project_code=forgery_py.lorem_ipsum.word(),
+                description=forgery_py.lorem_ipsum.sentence(),
+                start_date=forgery_py.date.date(True),
+                end_date=forgery_py.date.date(True)
+                )
 
-db.event.listen(Post.body, 'set', Post.on_changed_body)
-
-
-class Comment(db.Model):
-    __tablename__ = 'comments'
-    id = db.Column(db.Integer, primary_key=True)
-    body = db.Column(db.Text)
-    body_html = db.Column(db.Text)
-    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    disabled = db.Column(db.Boolean)
-    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
-
-    @staticmethod
-    def on_changed_body(target, value, oldvalue, initiator):
-        allowed_tags = ['a', 'abbr', 'acronym', 'b', 'code', 'em', 'i',
-                        'strong']
-        target.body_html = bleach.linkify(bleach.clean(
-            markdown(value, output_format='html'),
-            tags=allowed_tags, strip=True))
-
-    def to_json(self):
-        json_comment = {
-            'url': url_for('api.get_comment', id=self.id, _external=True),
-            'post': url_for('api.get_post', id=self.post_id, _external=True),
-            'body': self.body,
-            'body_html': self.body_html,
-            'timestamp': self.timestamp,
-            'author': url_for('api.get_user', id=self.author_id,
-                              _external=True),
-        }
-        return json_comment
-
-    @staticmethod
-    def from_json(json_comment):
-        body = json_comment.get('body')
-        if body is None or body == '':
-            raise ValidationError('comment does not have a body')
-        return Comment(body=body)
-
-
-db.event.listen(Comment.body, 'set', Comment.on_changed_body)
+            db.session.add(r)
+            try:
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
+       

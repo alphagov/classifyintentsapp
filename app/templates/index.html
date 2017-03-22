@@ -2,34 +2,44 @@
 {% import "bootstrap/wtf.html" as wtf %}
 {% import "_macros.html" as macros %}
 
-{% block title %}Flasky{% endblock %}
+{% block title %}Classify Intents Survey{% endblock %}
 
 {% block page_content %}
-<div class="page-header">
-    <h1>Hello, {% if current_user.is_authenticated %}{{ current_user.username }}{% else %}Stranger{% endif %}!</h1>
-</div>
 <div>
-    {% if current_user.can(Permission.WRITE_ARTICLES) %}
-    {{ wtf.quick_form(form) }}
+    {% if current_user.is_authenticated %}
+        
+    <h2>Survey:</h2>
+    {% if survey.comment_why_you_came %}
+    <h5 class='survey_question'>Describe why you came to GOV.UK today:</h5>
+    <p>{{ survey.comment_why_you_came | safe }}</p>
+    {% endif %}
+    {% if survey.comment_where_for_help %}
+    <h5 class='survey_question'>Where did you go for help?:</h5>
+    <p>{{ survey.comment_where_for_help | safe }}</p>
+    {% endif %}
+    {% if survey.comment_further_comments %}
+    <h5 class='survey_question'>If you wish to comment further, pleae do so here:</h5>
+    <p>{{ survey.comment_further_comments | safe }}</p>
+    {% endif %}
+    
+    <form method="POST">
+    {{ form.hidden_tag() }}
+    <h5 class='survey_question'>What CODE do you think best describes these comments?</h5>
+    {{ form.code() }}
+    <h5 class='survey_question'>Which PROJECT CODE can be applied to the survey if any?</h5>
+    {{ form.project_code() }}
+    <h5 class='survey_question'>Is there Personal Identifying Information (PII) in this survey?</h5>
+    {{ form.PII_boolean() }}
+    <br><br>
+    {{ form.submit() }}
+    </form>
+ 
+{% else %}
+    
+    <a href="{{ url_for('auth.login') }}">Please log in here</a>
+
     {% endif %}
 </div>
-<div class="post-tabs">
-    <ul class="nav nav-tabs">
-        <li{% if not show_followed %} class="active"{% endif %}><a href="{{ url_for('.show_all') }}">All</a></li>
-        {% if current_user.is_authenticated %}
-        <li{% if show_followed %} class="active"{% endif %}><a href="{{ url_for('.show_followed') }}">Followers</a></li>
-        {% endif %}
-    </ul>
-    {% include '_posts.html' %}
-</div>
-{% if pagination %}
-<div class="pagination">
-    {{ macros.pagination_widget(pagination, '.index') }}
-</div>
-{% endif %}
+
 {% endblock %}
 
-{% block scripts %}
-{{ super() }}
-{{ pagedown.include_pagedown() }}
-{% endblock %}
