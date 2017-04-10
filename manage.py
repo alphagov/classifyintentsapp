@@ -14,7 +14,7 @@ if os.path.exists('.env'):
             os.environ[var[0]] = var[1]
 
 from app import create_app, db
-from app.models import User, Role, Permission, Codes, Raw, ProjectCodes, Classified
+from app.models import User, Role, Permission, Codes, Raw, ProjectCodes, Classified, Priority
 from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
 
@@ -33,7 +33,8 @@ def make_shell_context():
         Codes=Codes,
         ProjectCodes=ProjectCodes,
         Raw=Raw,
-        Classified=Classified
+        Classified=Classified,
+        Priority=Priority
         )
 
 manager.add_command("shell", Shell(make_context=make_shell_context))
