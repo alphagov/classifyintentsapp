@@ -344,7 +344,7 @@ class Raw(db.Model):
 
 class Codes(db.Model):
     __tablename__ = 'codes'
-    code_id = db.Column(db.Integer(), primary_key=True, index=true)
+    code_id = db.Column(db.Integer(), primary_key=True, index=True)
     code = db.Column(db.String(50))
     description = db.Column(db.String())
     start_date = db.Column(db.DateTime())
