@@ -5,7 +5,7 @@ from sqlalchemy.sql.expression import func
 from . import main
 from .forms import EditProfileForm, EditProfileAdminForm, ClassifyForm
 from .. import db
-from ..models import Permission, Role, User, Classified, Raw, Codes, ProjectCodes
+from ..models import Permission, Role, User, Classified, Raw, Codes, ProjectCodes, Priority
 from ..decorators import admin_required, permission_required
 from datetime import datetime
 from functools import wraps
@@ -36,11 +36,10 @@ def server_shutdown():
 @login_required
 def index():
 
-    # Select a survey from the raw table.
-    # Eventually this will come from a view that has
-    # been prioritised.
+    # Select a survey from the priority view.
 
-    survey = Raw.query.order_by(func.random()).first()
+    priority = Priority.query.first()
+    survey = Raw.query.filter(Raw.respondent_id==priority.respondent_id).first()
     survey_id = survey.respondent_id
 
     # Create forms for entering code and project_code
@@ -59,7 +58,7 @@ def index():
     ####### Debug stuff
     
     if codes_form.validate_on_submit():
-        flash('Survey classified')
+        flash('Survey %r classified' % survey_id)
 
         # Save data into the Classified table
 

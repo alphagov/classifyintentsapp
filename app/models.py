@@ -231,11 +231,11 @@ def load_user(user_id):
 class Classified(db.Model):
     __tablename__ = 'classified'
     classified_id = db.Column(db.Integer(), primary_key=True, index=True)
-    respondent_id = db.Column(db.BigInteger(), db.ForeignKey('raw.respondent_id')) 
-    coder_id = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=False)
-    code_id = db.Column(db.Integer(), db.ForeignKey('codes.code_id'), nullable=False)
-    project_code_id = db.Column(db.Integer(), db.ForeignKey('project_codes.project_code_id')) 
-    pip = db.Column(db.Boolean())
+    respondent_id = db.Column(db.BigInteger(), db.ForeignKey('raw.respondent_id'), index=True) 
+    coder_id = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=False, index=True)
+    code_id = db.Column(db.Integer(), db.ForeignKey('codes.code_id'), nullable=False, index=True)
+    project_code_id = db.Column(db.Integer(), db.ForeignKey('project_codes.project_code_id'), index=True) 
+    pip = db.Column(db.Boolean(), index=True)
     date_coded = db.Column(db.DateTime(), nullable=False)
 
     @staticmethod
@@ -275,10 +275,6 @@ class Classified(db.Model):
     def __repr__(self):
         return '<respondent_id %r>' % self.respondent_id
 
-
-    #def __repr__(self):
-    #    return '<respondent_id %r>' % self.respondent_id
-
 class Raw(db.Model):
     __tablename__ = 'raw'
     respondent_id = db.Column(db.BigInteger(), primary_key=True, index=True)
@@ -302,6 +298,9 @@ class Raw(db.Model):
     comment_where_for_help = db.Column(db.String())
     comment_further_comments = db.Column(db.String())
     classified = db.relationship('Classified', backref='surveys_classified', lazy='dynamic')
+
+    def __repr__(self):
+        return '<respondent_id %r start_date %r>' % (self.respondent_id, self.start_date)
 
     @staticmethod
     def generate_fake(count=100):
@@ -345,12 +344,15 @@ class Raw(db.Model):
 
 class Codes(db.Model):
     __tablename__ = 'codes'
-    code_id = db.Column(db.Integer(), primary_key=True)
+    code_id = db.Column(db.Integer(), primary_key=True, index=true)
     code = db.Column(db.String(50))
     description = db.Column(db.String())
     start_date = db.Column(db.DateTime())
     end_date = db.Column(db.DateTime())
     classified = db.relationship('Classified', backref='code_surveys', lazy='dynamic')
+
+    def __repr__(self):
+        return '<code %r code_id %r>' % (self.code, self.code_id)
 
     @staticmethod
     def generate_fake(count=10):
@@ -393,12 +395,15 @@ class Codes(db.Model):
 
 class ProjectCodes(db.Model):
     __tablename__ = 'project_codes'
-    project_code_id = db.Column(db.Integer(), primary_key=True)
+    project_code_id = db.Column(db.Integer(), primary_key=True, index=True)
     project_code = db.Column(db.String(50))
     description = db.Column(db.String())
     start_date = db.Column(db.DateTime())
     end_date = db.Column(db.DateTime())
     classified = db.relationship('Classified', backref='project_surveys', lazy='dynamic')
+
+    def __repr__(self):
+        return '<project_code %r project_code_id %r>' % (self.project_code, self.project_code_id)
 
     @staticmethod
     def generate_fake(count=3):
@@ -437,4 +442,16 @@ class ProjectCodes(db.Model):
                 db.session.commit()
             except IntegrityError:
                 db.session.rollback()
-       
+
+class Priority(db.Model):
+    __tablename__ = 'priority'
+    respondent_id = db.Column(db.BigInteger(), primary_key=True)
+    start_date = db.Column(db.DateTime())
+    max = db.Column(db.BigInteger())
+    ratio = db.Column(db.Numeric())
+    total = db.Column(db.Integer())
+    priority = db.Column(db.Integer())
+    
+    def __repr__(self):
+        return '<respondent_id %r date %r priority %r>' % (self.respondent_id, self.start_date, self.priority)
+
