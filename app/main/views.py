@@ -7,8 +7,9 @@ from .forms import EditProfileForm, EditProfileAdminForm, ClassifyForm
 from .. import db
 from ..models import Permission, Role, User, Classified, Raw, Codes, ProjectCodes, Priority
 from ..decorators import admin_required, permission_required
-from datetime import datetime
+from datetime import datetime, date
 from functools import wraps
+from random import choice
 
 @main.after_app_request
 def after_request(response):
@@ -73,8 +74,19 @@ def index():
 
     ####### Debug stuff
     
+
     if codes_form.validate_on_submit():
-        flash('Survey %r classified' % survey_id)
+        flash('Survey %s classified' % survey_id)
+
+        # Get number of surveys coded today
+
+        coded_today = Classified.query.filter(Classified.date_coded > date.today()).count()
+        
+        if coded_today%10 == 0:
+            
+            exclaim = ['Well Done!', 'Great!', 'Congratulations!', 'Great Work!', 'Boom!']§
+
+            flash('%s You have coded %d surveys today!' % (choice(exclaim), coded_today))
 
         # Save data into the Classified table
 
