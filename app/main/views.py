@@ -32,19 +32,30 @@ def server_shutdown():
     shutdown()
     return 'Shutting down...'
 
+# Function to select the next survey: ensures that a coder doesn't see the same
+# survey more than once.
+
 def new_survey(user, model):
 
     priority = model.query.filter(Priority.priority<8).all()
 
     priority_list = [i for i in priority if i.coders is None or user not in i.coders]
     
-    while len(priority_list) == 0:
-        
+    # Set a limit on how many failures to accept
+
+    count = 0
+
+    while len(priority_list) == 0 and count < 3:
+
+        count += 1
+
         priority = model.query.filter(Priority.priority<8).all()
 
         priority_list = [i for i in priority if i.coders is None or user not in i.coders]
     
-    return(priority_list[0])
+    return(priority_list)
+
+# Main classification page
 
 @main.route('/', methods=['GET', 'POST'])
 @login_required
@@ -55,59 +66,60 @@ def index():
     # is found that the user has not yet seen.
 
     priority = new_survey(current_user.id, Priority)    
-
-    survey = Raw.query.filter(Raw.respondent_id==priority.respondent_id).first()
-    survey_id = survey.respondent_id
-
-    # Create forms for entering code and project_code
-
-    codes_form = ClassifyForm.codes()
-
-    # Not necessary to validate project_code as it is
-    # often absent
-
-    ####### Debug stuff:
-
-#    print(codes_form.errors)
-#    print(codes_form.validate())
-#    print(survey_id, codes_form.code.data, codes_form.project_code.data, codes_form.PII_boolean.data, '{:%Y-%m-%d %H:%M:%S.%f}'.format(datetime.now()), current_user.email)
-
-    ####### Debug stuff
     
+    # Check that there are some entries returned if not
+    # Redirect to 'All done page'
 
-    if codes_form.validate_on_submit():
-        flash('Survey %s classified' % survey_id)
-
-        # Get number of surveys coded today
-
-        coded_today = Classified.query.filter(Classified.date_coded > date.today()).count()
+    if len(priority) == 0:
         
-        if coded_today%10 == 0:
+        flash('You\'re all caught up. Check back later for new surveys.')
+
+        return render_template('404.html')
+
+    else:
+        priority = priority[0]
+    
+        survey = Raw.query.filter(Raw.respondent_id==priority.respondent_id).first()
+        survey_id = survey.respondent_id
+
+        # Create forms for entering code and project_code
+
+        codes_form = ClassifyForm.codes()
+
+
+        if codes_form.validate_on_submit():
+            flash('Survey %s classified' % survey_id)
+
+            # Get number of surveys coded today, and print number on every ten
+
+            coded_today = Classified.query.filter(Classified.date_coded > date.today()).count() + 1
+        
+            if coded_today%10 == 0:
             
-            exclaim = ['Well Done!', 'Great!', 'Congratulations!', 'Great Work!', 'Boom!']
+                exclaim = ['Well Done!', 'Great!', 'Congratulations!', 'Great Work!', 'Boom!']
 
-            flash('%s You have coded %d surveys today!' % (choice(exclaim), coded_today))
+                flash('%s You have coded %d surveys today!' % (choice(exclaim), coded_today))
 
-        # Save data into the Classified table
+            # Save data into the Classified table
 
-        survey_classification = Classified(
-            respondent_id=survey_id,
-            code_id=codes_form.code.data,
-            project_code_id=codes_form.project_code.data,
-            pip=codes_form.PII_boolean.data,
-            date_coded='{:%Y-%m-%d %H:%M:%S.%f}'.format(datetime.now()),
-            coder_id=current_user.id
-            )
+            survey_classification = Classified(
+                respondent_id=survey_id,
+                code_id=codes_form.code.data,
+                project_code_id=codes_form.project_code.data,
+                pip=codes_form.PII_boolean.data,
+                date_coded='{:%Y-%m-%d %H:%M:%S.%f}'.format(datetime.now()),
+                coder_id=current_user.id
+                )
 
-        db.session.add(survey_classification)
-        db.session.commit()
+            db.session.add(survey_classification)
+            db.session.commit()
 
-        # Here the code is reset (probably not required
-        # when working fully)
+            # Here the code is reset (probably not required
+            # when working fully)
 
-        return redirect(url_for('main.index'))
+            return redirect(url_for('main.index'))
 
-    return render_template('index.html', form=codes_form, survey=survey)
+        return render_template('index.html', form=codes_form, survey=survey)
 
 
 @main.route('/user/<username>')
