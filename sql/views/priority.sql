@@ -54,6 +54,11 @@ survey_level_ratio as (
 select respondent_id, max(code_id) as coded, max(max) as max, max(ratio) as ratio, max(total) as total 
 from ratio_table
 group by respondent_id
+),
+who_coded_what as (
+select respondent_id, array_agg(distinct classified.coder_id) as coders 
+from classified 
+group by respondent_id
 )
 -- Priority is controlled with the case when statement here
 -- The lower the number, the higher the priority.
@@ -62,6 +67,7 @@ select  slr.respondent_id,
         slr.max,
         slr.ratio,
         slr.total,
+        wcw.coders,
         case 
             -- When there is a majority, but less than 3 people coded
             when (slr.ratio > 0.5 and slr.total > 1 and slr.total < 5)
@@ -79,6 +85,8 @@ select  slr.respondent_id,
 from survey_level_ratio slr
 left join raw
 on (slr.respondent_id=raw.respondent_id)
-order by priority, raw.start_date
+left join who_coded_what wcw
+on (slr.respondent_id=wcw.respondent_id)
+order by priority, raw.start_date, respondent_id
 );
 

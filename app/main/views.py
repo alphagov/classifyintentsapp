@@ -31,14 +31,30 @@ def server_shutdown():
     shutdown()
     return 'Shutting down...'
 
+def new_survey(user, model):
+
+    priority = model.query.filter(Priority.priority<8).all()
+
+    priority_list = [i for i in priority if i.coders is None or user not in i.coders]
+    
+    while len(priority_list) == 0:
+        
+        priority = model.query.filter(Priority.priority<8).all()
+
+        priority_list = [i for i in priority if i.coders is None or user not in i.coders]
+    
+    return(priority_list[0])
 
 @main.route('/', methods=['GET', 'POST'])
 @login_required
 def index():
 
     # Select a survey from the priority view.
+    # While loop keeps running until a survey
+    # is found that the user has not yet seen.
 
-    priority = Priority.query.first()
+    priority = new_survey(current_user.id, Priority)    
+
     survey = Raw.query.filter(Raw.respondent_id==priority.respondent_id).first()
     survey_id = survey.respondent_id
 
