@@ -84,7 +84,7 @@ def index():
         
         if coded_today%10 == 0:
             
-            exclaim = ['Well Done!', 'Great!', 'Congratulations!', 'Great Work!', 'Boom!']§
+            exclaim = ['Well Done!', 'Great!', 'Congratulations!', 'Great Work!', 'Boom!']
 
             flash('%s You have coded %d surveys today!' % (choice(exclaim), coded_today))
 
