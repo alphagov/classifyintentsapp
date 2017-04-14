@@ -9,6 +9,7 @@ from flask_login import UserMixin, AnonymousUserMixin
 from app.exceptions import ValidationError
 from . import db, login_manager
 from random import choice
+from app.urllookup import *
 
 class Permission:
     FOLLOW = 0x01
