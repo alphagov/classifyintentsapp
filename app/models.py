@@ -460,7 +460,7 @@ class Priority(db.Model):
 
 class Urls(db.Model):
     __tablename__ = 'urls'
-    url_id = db.Colum(db.Integer(), primary_key=True, index=True)
+    url_id = db.Column(db.Integer(), primary_key=True, index=True)
     full_url = db.Column(db.String(), index=True)
     page = db.Column(db.String(), index=True)
     section = db.Column(db.String(), index=True)

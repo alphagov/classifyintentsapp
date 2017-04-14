@@ -1,11 +1,28 @@
 
 # coding: utf-8
 
-import numpy as np
-import pandas as pd
+#import numpy as np
+#import pandas as pd
 import re, requests
-from sklearn.preprocessing import LabelEncoder
-import os.path
+import forgery_py
+import time
+
+def random_url():
+    attempts = 0
+
+    r = forgery_py.internet.domain_name()
+    
+    while attempts < 5:
+        try:
+            r = requests.get('https://gov.uk/random').url
+            r = r.replace('https://www.gov.uk', '')
+            break
+        except:
+            attempts += 1
+            time.sleep(1)
+        
+    return(r)
+
 
 def clean_urls(self):
 
