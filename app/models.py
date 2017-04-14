@@ -357,7 +357,7 @@ class Codes(db.Model):
     @staticmethod
     def generate_fake(count=10):
         from sqlalchemy.exc import IntegrityError
-        from random import seed, randint
+        from random import seed, randint, choice
         import forgery_py
 
         seed()
@@ -369,7 +369,7 @@ class Codes(db.Model):
             code='none',
             description='none',
             start_date=forgery_py.date.date(True),
-            end_date=forgery_py.date.date(True)
+            end_date=None
             )
 
         db.session.add(r)
@@ -383,7 +383,7 @@ class Codes(db.Model):
                 code=forgery_py.lorem_ipsum.word(),
                 description=forgery_py.lorem_ipsum.sentence(),
                 start_date=forgery_py.date.date(True),
-                end_date=forgery_py.date.date(True)
+                end_date=choice([None,forgery_py.date.date(True)])
                 )
 
             db.session.add(r)
@@ -408,7 +408,7 @@ class ProjectCodes(db.Model):
     @staticmethod
     def generate_fake(count=3):
         from sqlalchemy.exc import IntegrityError
-        from random import seed, randint
+        from random import seed, randint, choice
         import forgery_py
 
         seed()
@@ -420,7 +420,7 @@ class ProjectCodes(db.Model):
             project_code='none',
             description='none',
             start_date=forgery_py.date.date(True),
-            end_date=forgery_py.date.date(True)
+            end_date=None
             )
 
         db.session.add(r)
@@ -434,7 +434,7 @@ class ProjectCodes(db.Model):
                 project_code=forgery_py.lorem_ipsum.word(),
                 description=forgery_py.lorem_ipsum.sentence(),
                 start_date=forgery_py.date.date(True),
-                end_date=forgery_py.date.date(True)
+                end_date=choice([None,forgery_py.date.date(True)])
                 )
 
             db.session.add(r)
