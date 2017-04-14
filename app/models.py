@@ -456,3 +456,47 @@ class Priority(db.Model):
     def __repr__(self):
         return '<respondent_id %s date %s priority %s>' % (self.respondent_id, self.start_date, self.priority)
 
+
+class Urls(db.Model):
+    __tablename__ = 'urls'
+    url_id = db.Colum(db.Integer(), primary_key=True, index=True)
+    full_url = db.Column(db.String(), index=True)
+    page = db.Column(db.String(), index=True)
+    section = db.Column(db.String(), index=True)
+    org = db.Column(db.String(), index=True)
+    lookup_date = db.Column(db.DateTime(), index=True)
+    
+    def __repr__(self):
+        return '<full_url %s %s>' % (self.full_url, self.lookup_date)
+
+    @staticmethod
+    def single_lookup():
+        from sqlalchemy.exc import IntegrityError
+
+ 
+        r = ProjectCodes(
+            project_code='none',
+            description='none',
+            start_date=forgery_py.date.date(True),
+            end_date=None
+            )
+
+        db.session.add(r)
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+ 
+        for i in range(count):
+            r = ProjectCodes(
+                project_code=forgery_py.lorem_ipsum.word(),
+                description=forgery_py.lorem_ipsum.sentence(),
+                start_date=forgery_py.date.date(True),
+                end_date=choice([None,forgery_py.date.date(True)])
+                )
+
+            db.session.add(r)
+            try:
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
