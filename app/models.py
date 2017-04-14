@@ -48,7 +48,7 @@ class Role(db.Model):
         db.session.commit()
 
     def __repr__(self):
-        return '<Role %r>' % self.name
+        return '<Role %s>' % self.name
 
 
 class User(UserMixin, db.Model):
@@ -211,7 +211,7 @@ class User(UserMixin, db.Model):
         return User.query.get(data['id'])
 
     def __repr__(self):
-        return '<User %r>' % self.username
+        return '<User %s>' % self.username
 
 
 class AnonymousUser(AnonymousUserMixin):
@@ -273,7 +273,7 @@ class Classified(db.Model):
                 db.session.rollback()
     
     def __repr__(self):
-        return '<respondent_id %r>' % self.respondent_id
+        return '<respondent_id %s>' % self.respondent_id
 
 class Raw(db.Model):
     __tablename__ = 'raw'
@@ -300,7 +300,7 @@ class Raw(db.Model):
     classified = db.relationship('Classified', backref='surveys_classified', lazy='dynamic')
 
     def __repr__(self):
-        return '<respondent_id %r start_date %r>' % (self.respondent_id, self.start_date)
+        return '<respondent_id %s start_date %s>' % (self.respondent_id, self.start_date)
 
     @staticmethod
     def generate_fake(count=100):
@@ -340,7 +340,7 @@ class Raw(db.Model):
                 db.session.rollback()
     
     def __repr__(self):
-        return '<respondent_id %r>' % self.respondent_id
+        return '<respondent_id %s>' % self.respondent_id
 
 class Codes(db.Model):
     __tablename__ = 'codes'
@@ -352,7 +352,7 @@ class Codes(db.Model):
     classified = db.relationship('Classified', backref='code_surveys', lazy='dynamic')
 
     def __repr__(self):
-        return '<code %r code_id %r>' % (self.code, self.code_id)
+        return '<code %s code_id %s>' % (self.code, self.code_id)
 
     @staticmethod
     def generate_fake(count=10):
@@ -403,7 +403,7 @@ class ProjectCodes(db.Model):
     classified = db.relationship('Classified', backref='project_surveys', lazy='dynamic')
 
     def __repr__(self):
-        return '<project_code %r project_code_id %r>' % (self.project_code, self.project_code_id)
+        return '<project_code %s project_code_id %s>' % (self.project_code, self.project_code_id)
 
     @staticmethod
     def generate_fake(count=3):
@@ -454,5 +454,5 @@ class Priority(db.Model):
     priority = db.Column(db.Integer())
     
     def __repr__(self):
-        return '<respondent_id %r date %r priority %r>' % (self.respondent_id, self.start_date, self.priority)
+        return '<respondent_id %s date %s priority %s>' % (self.respondent_id, self.start_date, self.priority)
 
