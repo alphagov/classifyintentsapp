@@ -92,11 +92,11 @@ def index():
 
             # Get number of surveys coded today, and print number on every ten
 
-            coded_today = Classified.query.filter(Classified.date_coded > date.today()).count() + 1
+            coded_today = Classified.query.filter(Classified.coder_id == current_user.id).filter(Classified.date_coded > date.today()).count() + 1
         
             if coded_today%10 == 0:
             
-                exclaim = ['Well Done!', 'Great!', 'Congratulations!', 'Great Work!', 'Boom!']
+                exclaim = ['Well Done!', 'Great!', 'Congratulations!', 'Great Work!', 'Boom!', 'Amazeballs!', 'Amazing!']
 
                 flash('%s You have coded %d surveys today!' % (choice(exclaim), coded_today))
 
