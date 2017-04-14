@@ -8,28 +8,23 @@
 <div>
     {% if current_user.is_authenticated %}
         
-    <h2>Survey:</h2>
-    {% if survey.comment_why_you_came %}
-    <h5 class='survey_question'>Describe why you came to GOV.UK today:</h5>
-    <p>{{ survey.comment_why_you_came | safe }}</p>
-    {% endif %}
-    {% if survey.comment_where_for_help %}
-    <h5 class='survey_question'>Where did you go for help?:</h5>
-    <p>{{ survey.comment_where_for_help | safe }}</p>
-    {% endif %}
-    {% if survey.comment_further_comments %}
-    <h5 class='survey_question'>If you wish to comment further, please do so here:</h5>
-    <p>{{ survey.comment_further_comments | safe }}</p>
-    {% endif %}
+    <h2>Read the survey response:</h2>
+
+    <p>{% if survey.comment_why_you_came %}{{ survey.comment_why_you_came | safe }} | {% endif %}
+    {% if survey.comment_where_for_help %}{{ survey.comment_where_for_help | safe }} | {% endif %}
+    {% if survey.comment_further_comments %}{{ survey.comment_further_comments | safe }}{% endif %}
     
+    <h2>Apply a Code:</h2>
     <form method="POST">
     {{ form.hidden_tag() }}
-    <h5 class='survey_question'>What CODE do you think best describes these comments?</h5>
+    <h5>Which CODE do you think best describes these comments?</h5>
     {{ form.code() }}
-    <h5 class='survey_question'>Which PROJECT CODE can be applied to the survey if any?</h5>
+    <h2>Apply a Project Code:</h2>
+    <h5>Which PROJECT CODE can be applied to the survey if any?</h5>
     {{ form.project_code() }}
-    <h5 class='survey_question'>Is there Personal Identifying Information (PII) in this survey?</h5>
-    {{ form.PII_boolean() }}
+    <h2>Is there PII?<h2>
+    <h5>Is there Personally Identifying Information (PII) in this survey?</h5>
+    {{ form.PII_boolean() }} YES
     <br><br>
     {{ form.submit() }}
     </form>
