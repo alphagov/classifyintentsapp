@@ -44,3 +44,6 @@ venv
 *.swp
 include/
 pip-selfcheck.json
+geckodriver.log
+selenium
+tmp

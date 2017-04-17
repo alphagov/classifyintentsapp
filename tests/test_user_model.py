@@ -2,7 +2,7 @@ import unittest
 import time
 from datetime import datetime
 from app import create_app, db
-from app.models import User, AnonymousUser, Role, Permission, Follow
+from app.models import User, Role, Permission
 
 
 class UserModelTestCase(unittest.TestCase):
@@ -112,10 +112,6 @@ class UserModelTestCase(unittest.TestCase):
         self.assertTrue(u.can(Permission.WRITE_ARTICLES))
         self.assertFalse(u.can(Permission.MODERATE_COMMENTS))
 
-    def test_anonymous_user(self):
-        u = AnonymousUser()
-        self.assertFalse(u.can(Permission.FOLLOW))
-
     def test_timestamps(self):
         u = User(password='cat')
         db.session.add(u)
@@ -151,49 +147,3 @@ class UserModelTestCase(unittest.TestCase):
         self.assertTrue('https://secure.gravatar.com/avatar/' +
                         'd4c74594d841139328695756648b6bd6' in gravatar_ssl)
 
-    def test_follows(self):
-        u1 = User(email='john@example.com', password='cat')
-        u2 = User(email='susan@example.org', password='dog')
-        db.session.add(u1)
-        db.session.add(u2)
-        db.session.commit()
-        self.assertFalse(u1.is_following(u2))
-        self.assertFalse(u1.is_followed_by(u2))
-        timestamp_before = datetime.utcnow()
-        u1.follow(u2)
-        db.session.add(u1)
-        db.session.commit()
-        timestamp_after = datetime.utcnow()
-        self.assertTrue(u1.is_following(u2))
-        self.assertFalse(u1.is_followed_by(u2))
-        self.assertTrue(u2.is_followed_by(u1))
-        self.assertTrue(u1.followed.count() == 2)
-        self.assertTrue(u2.followers.count() == 2)
-        f = u1.followed.all()[-1]
-        self.assertTrue(f.followed == u2)
-        self.assertTrue(timestamp_before <= f.timestamp <= timestamp_after)
-        f = u2.followers.all()[-1]
-        self.assertTrue(f.follower == u1)
-        u1.unfollow(u2)
-        db.session.add(u1)
-        db.session.commit()
-        self.assertTrue(u1.followed.count() == 1)
-        self.assertTrue(u2.followers.count() == 1)
-        self.assertTrue(Follow.query.count() == 2)
-        u2.follow(u1)
-        db.session.add(u1)
-        db.session.add(u2)
-        db.session.commit()
-        db.session.delete(u2)
-        db.session.commit()
-        self.assertTrue(Follow.query.count() == 1)
-
-    def test_to_json(self):
-        u = User(email='john@example.com', password='cat')
-        db.session.add(u)
-        db.session.commit()
-        json_user = u.to_json()
-        expected_keys = ['url', 'username', 'member_since', 'last_seen',
-                         'posts', 'followed_posts', 'post_count']
-        self.assertEqual(sorted(json_user.keys()), sorted(expected_keys))
-        self.assertTrue('api/v1.0/users/' in json_user['url'])
