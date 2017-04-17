@@ -18,9 +18,12 @@ class FlaskClientTestCase(unittest.TestCase):
         db.drop_all()
         self.app_context.pop()
 
-    def test_home_page(self):
-        response = self.client.get(url_for('main.index'))
-        self.assertTrue(b'Stranger' in response.data)
+#   Following test will fail in intents app, as anonymous users are
+#   not allowed.
+#
+#    def test_home_page(self):
+#        response = self.client.get(url_for('main.index'))
+#        self.assertTrue(b'Stranger' in response.data)
 
     def test_register_and_login(self):
         # register a new account
