@@ -106,7 +106,7 @@ def index():
                 respondent_id=survey_id,
                 code_id=codes_form.code.data,
                 project_code_id=codes_form.project_code.data,
-                pip=codes_form.PII_boolean.data,
+                pii=codes_form.PII_boolean.data,
                 date_coded='{:%Y-%m-%d %H:%M:%S.%f}'.format(datetime.now()),
                 coder_id=current_user.id
                 )
