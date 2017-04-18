@@ -235,7 +235,7 @@ class Classified(db.Model):
     coder_id = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=False, index=True)
     code_id = db.Column(db.Integer(), db.ForeignKey('codes.code_id'), nullable=False, index=True)
     project_code_id = db.Column(db.Integer(), db.ForeignKey('project_codes.project_code_id'), index=True) 
-    pip = db.Column(db.Boolean(), index=True)
+    pii = db.Column(db.Boolean(), index=True)
     date_coded = db.Column(db.DateTime(), nullable=False)
 
     @staticmethod
