@@ -56,7 +56,7 @@ from ratio_table
 group by respondent_id
 ),
 who_coded_what as (
-select respondent_id, array_agg(distinct classified.coder_id) as coders 
+select respondent_id, array_agg(distinct classified.coder_id) as coders, count(pii or null) as pii
 from classified 
 group by respondent_id
 )
@@ -68,7 +68,9 @@ select  slr.respondent_id,
         slr.ratio,
         slr.total,
         wcw.coders,
+        wcw.pii,
         case 
+            when wcw.pii > 0 then 8
             -- When there is a majority, but less than 3 people coded
             when (slr.ratio > 0.5 and slr.total > 1 and slr.total < 5)
             or (slr.ratio = 1 and slr.total = 2) then 3
@@ -79,7 +81,7 @@ select  slr.respondent_id,
             -- When the survey has been coded just once
             when slr.total = 1 and slr.ratio = 1 and slr.coded is not null then 1
             -- When the survey is difficult to code (no majority after 5)
-            when slr.total > 5 and slr.ratio < 0.5 then 8 
+            when slr.total > 5 and slr.ratio < 0.5 then 7
             else 9
         end as priority
 from survey_level_ratio slr
