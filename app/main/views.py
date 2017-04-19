@@ -49,7 +49,7 @@ def new_survey(user, model):
 
         count += 1
 
-        priority = model.query.filter(Priority.priority<8).all()
+        priority = model.query.filter(Priority.priority<7).all()
 
         priority_list = [i for i in priority if i.coders is None or user not in i.coders]
     
