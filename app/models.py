@@ -303,10 +303,44 @@ class Raw(db.Model):
         return '<respondent_id %s start_date %s>' % (self.respondent_id, self.start_date)
 
     @staticmethod
+    def get_urls(count=10, file='govukurls.txt'):
+
+        """
+        Method to create a list of urls for use in the generate_fake()
+        method.
+        """
+
+        import re
+        import requests
+        import forgery_py
+        import time
+    
+        # Create a list of 100 urls
+        
+        print('Looking up %s random gov.uk pages' % count)
+        print('This may take some time...')
+
+        govukurls = [random_url(count) for i in range(count)]
+
+        # Write urls to a file
+
+        with open(file, 'a') as f:
+            govukurls = map(lambda x: x+'\n', govukurls)
+            f.writelines(govukurls)
+
+        print('...lookup complete')
+        print('Appending to %s' % file)
+
+    @staticmethod
     def generate_fake(count=100):
         from sqlalchemy.exc import IntegrityError
         from random import seed, randint, choice
         import forgery_py
+        
+        # Load a random list of gov.uk urls 
+            
+        with open('govukurls.txt') as f:
+            govukurls = f.read().splitlines()
 
         seed()
         for i in range(count):
@@ -319,7 +353,7 @@ class Raw(db.Model):
                 email_address = '',
                 first_name = '',
                 last_name = '',
-                full_url = forgery_py.internet.domain_name(),
+                full_url = choice(govukurls),
                 cat_work_or_personal = forgery_py.lorem_ipsum.word(),
                 comment_what_work = forgery_py.lorem_ipsum.words(3),
                 comment_why_you_came = forgery_py.lorem_ipsum.sentences(2),
@@ -450,9 +484,68 @@ class Priority(db.Model):
     max = db.Column(db.BigInteger())
     ratio = db.Column(db.Numeric())
     total = db.Column(db.Integer())
-    coders = db.Column(db.ARRAY(db.Integer))
+    coders = db.Column(db.ARRAY(db.Integer()))
     priority = db.Column(db.Integer())
     
     def __repr__(self):
         return '<respondent_id %s date %s priority %s>' % (self.respondent_id, self.start_date, self.priority)
 
+
+class Urls(db.Model):
+    __tablename__ = 'urls'
+    url_id = db.Column(db.Integer(), primary_key=True, index=True)
+    full_url = db.Column(db.String(), index=True)
+    page = db.Column(db.String(), index=True)
+    section0 = db.Column(db.String(), index=True)
+    section1 = db.Column(db.String(), index=True)
+    section2 = db.Column(db.String(), index=True)
+    section3 = db.Column(db.String(), index=True)
+    org0 = db.Column(db.String(), index=True)
+    org1 = db.Column(db.String(), index=True)
+    org2 = db.Column(db.String(), index=True)
+    org3 = db.Column(db.String(), index=True)
+    org4 = db.Column(db.String(), index=True)
+    lookup_date = db.Column(db.DateTime(), index=True)
+    
+    def __repr__(self):
+        return '<full_url %s org %s section %s date %s >' % (self.full_url, self.org0, self.section0, self.lookup_date)
+
+    @staticmethod
+    def bulk_lookup():
+        from sqlalchemy.exc import IntegrityError
+
+        # Check to ensure that we haven't already looked up this entry
+        # For now, disable this, as it may be necessary to have duplicate
+        # full_urls in the Urls table owing to Machinery of Govt changes.
+
+        #urls_full_urls = Urls.query.all()
+        #ulrs_full_urls = [i for i in urls_full_urls]
+
+        all_full_urls = Raw.query.filter_by().all()
+        
+        r = ProjectCodes(
+            project_code='none',
+            description='none',
+            start_date=forgery_py.date.date(True),
+            end_date=None
+            )
+
+        db.session.add(r)
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+ 
+        for i in range(count):
+            r = ProjectCodes(
+                project_code=forgery_py.lorem_ipsum.word(),
+                description=forgery_py.lorem_ipsum.sentence(),
+                start_date=forgery_py.date.date(True),
+                end_date=choice([None,forgery_py.date.date(True)])
+                )
+
+            db.session.add(r)
+            try:
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()

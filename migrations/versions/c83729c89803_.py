@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 96000ee13b72
+Revision ID: c83729c89803
 Revises: 
-Create Date: 2017-04-14 22:42:47.521859
+Create Date: 2017-04-19 17:58:49.488698
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '96000ee13b72'
+revision = 'c83729c89803'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -27,6 +27,16 @@ def upgrade():
     sa.PrimaryKeyConstraint('code_id')
     )
     op.create_index(op.f('ix_codes_code_id'), 'codes', ['code_id'], unique=False)
+    op.create_table('priority',
+    sa.Column('respondent_id', sa.BigInteger(), nullable=False),
+    sa.Column('start_date', sa.DateTime(), nullable=True),
+    sa.Column('max', sa.BigInteger(), nullable=True),
+    sa.Column('ratio', sa.Numeric(), nullable=True),
+    sa.Column('total', sa.Integer(), nullable=True),
+    sa.Column('coders', sa.ARRAY(sa.Integer()), nullable=True),
+    sa.Column('priority', sa.Integer(), nullable=True),
+    sa.PrimaryKeyConstraint('respondent_id')
+    )
     op.create_table('project_codes',
     sa.Column('project_code_id', sa.Integer(), nullable=False),
     sa.Column('project_code', sa.String(length=50), nullable=True),
@@ -75,24 +85,56 @@ def upgrade():
     sa.Column('url_id', sa.Integer(), nullable=False),
     sa.Column('full_url', sa.String(), nullable=True),
     sa.Column('page', sa.String(), nullable=True),
-    sa.Column('section', sa.String(), nullable=True),
-    sa.Column('org', sa.String(), nullable=True),
+    sa.Column('section0', sa.String(), nullable=True),
+    sa.Column('section1', sa.String(), nullable=True),
+    sa.Column('section2', sa.String(), nullable=True),
+    sa.Column('section3', sa.String(), nullable=True),
+    sa.Column('org0', sa.String(), nullable=True),
+    sa.Column('org1', sa.String(), nullable=True),
+    sa.Column('org2', sa.String(), nullable=True),
+    sa.Column('org3', sa.String(), nullable=True),
+    sa.Column('org4', sa.String(), nullable=True),
     sa.Column('lookup_date', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('url_id')
     )
     op.create_index(op.f('ix_urls_full_url'), 'urls', ['full_url'], unique=False)
     op.create_index(op.f('ix_urls_lookup_date'), 'urls', ['lookup_date'], unique=False)
-    op.create_index(op.f('ix_urls_org'), 'urls', ['org'], unique=False)
+    op.create_index(op.f('ix_urls_org0'), 'urls', ['org0'], unique=False)
+    op.create_index(op.f('ix_urls_org1'), 'urls', ['org1'], unique=False)
+    op.create_index(op.f('ix_urls_org2'), 'urls', ['org2'], unique=False)
+    op.create_index(op.f('ix_urls_org3'), 'urls', ['org3'], unique=False)
+    op.create_index(op.f('ix_urls_org4'), 'urls', ['org4'], unique=False)
     op.create_index(op.f('ix_urls_page'), 'urls', ['page'], unique=False)
-    op.create_index(op.f('ix_urls_section'), 'urls', ['section'], unique=False)
+    op.create_index(op.f('ix_urls_section0'), 'urls', ['section0'], unique=False)
+    op.create_index(op.f('ix_urls_section1'), 'urls', ['section1'], unique=False)
+    op.create_index(op.f('ix_urls_section2'), 'urls', ['section2'], unique=False)
+    op.create_index(op.f('ix_urls_section3'), 'urls', ['section3'], unique=False)
     op.create_index(op.f('ix_urls_url_id'), 'urls', ['url_id'], unique=False)
+    op.create_table('users',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('email', sa.String(length=64), nullable=True),
+    sa.Column('username', sa.String(length=64), nullable=True),
+    sa.Column('role_id', sa.Integer(), nullable=True),
+    sa.Column('password_hash', sa.String(length=128), nullable=True),
+    sa.Column('confirmed', sa.Boolean(), nullable=True),
+    sa.Column('name', sa.String(length=64), nullable=True),
+    sa.Column('location', sa.String(length=64), nullable=True),
+    sa.Column('about_me', sa.Text(), nullable=True),
+    sa.Column('member_since', sa.DateTime(), nullable=True),
+    sa.Column('last_seen', sa.DateTime(), nullable=True),
+    sa.Column('avatar_hash', sa.String(length=32), nullable=True),
+    sa.ForeignKeyConstraint(['role_id'], ['roles.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index(op.f('ix_users_email'), 'users', ['email'], unique=True)
+    op.create_index(op.f('ix_users_username'), 'users', ['username'], unique=False)
     op.create_table('classified',
     sa.Column('classified_id', sa.Integer(), nullable=False),
     sa.Column('respondent_id', sa.BigInteger(), nullable=True),
     sa.Column('coder_id', sa.Integer(), nullable=False),
     sa.Column('code_id', sa.Integer(), nullable=False),
     sa.Column('project_code_id', sa.Integer(), nullable=True),
-    sa.Column('pip', sa.Boolean(), nullable=True),
+    sa.Column('pii', sa.Boolean(), nullable=True),
     sa.Column('date_coded', sa.DateTime(), nullable=False),
     sa.ForeignKeyConstraint(['code_id'], ['codes.code_id'], ),
     sa.ForeignKeyConstraint(['coder_id'], ['users.id'], ),
@@ -103,27 +145,35 @@ def upgrade():
     op.create_index(op.f('ix_classified_classified_id'), 'classified', ['classified_id'], unique=False)
     op.create_index(op.f('ix_classified_code_id'), 'classified', ['code_id'], unique=False)
     op.create_index(op.f('ix_classified_coder_id'), 'classified', ['coder_id'], unique=False)
-    op.create_index(op.f('ix_classified_pip'), 'classified', ['pip'], unique=False)
+    op.create_index(op.f('ix_classified_pii'), 'classified', ['pii'], unique=False)
     op.create_index(op.f('ix_classified_project_code_id'), 'classified', ['project_code_id'], unique=False)
     op.create_index(op.f('ix_classified_respondent_id'), 'classified', ['respondent_id'], unique=False)
-    op.create_foreign_key(None, 'users', 'roles', ['role_id'], ['id'])
     # ### end Alembic commands ###
 
 
 def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
-    op.drop_constraint(None, 'users', type_='foreignkey')
     op.drop_index(op.f('ix_classified_respondent_id'), table_name='classified')
     op.drop_index(op.f('ix_classified_project_code_id'), table_name='classified')
-    op.drop_index(op.f('ix_classified_pip'), table_name='classified')
+    op.drop_index(op.f('ix_classified_pii'), table_name='classified')
     op.drop_index(op.f('ix_classified_coder_id'), table_name='classified')
     op.drop_index(op.f('ix_classified_code_id'), table_name='classified')
     op.drop_index(op.f('ix_classified_classified_id'), table_name='classified')
     op.drop_table('classified')
+    op.drop_index(op.f('ix_users_username'), table_name='users')
+    op.drop_index(op.f('ix_users_email'), table_name='users')
+    op.drop_table('users')
     op.drop_index(op.f('ix_urls_url_id'), table_name='urls')
-    op.drop_index(op.f('ix_urls_section'), table_name='urls')
+    op.drop_index(op.f('ix_urls_section3'), table_name='urls')
+    op.drop_index(op.f('ix_urls_section2'), table_name='urls')
+    op.drop_index(op.f('ix_urls_section1'), table_name='urls')
+    op.drop_index(op.f('ix_urls_section0'), table_name='urls')
     op.drop_index(op.f('ix_urls_page'), table_name='urls')
-    op.drop_index(op.f('ix_urls_org'), table_name='urls')
+    op.drop_index(op.f('ix_urls_org4'), table_name='urls')
+    op.drop_index(op.f('ix_urls_org3'), table_name='urls')
+    op.drop_index(op.f('ix_urls_org2'), table_name='urls')
+    op.drop_index(op.f('ix_urls_org1'), table_name='urls')
+    op.drop_index(op.f('ix_urls_org0'), table_name='urls')
     op.drop_index(op.f('ix_urls_lookup_date'), table_name='urls')
     op.drop_index(op.f('ix_urls_full_url'), table_name='urls')
     op.drop_table('urls')

@@ -47,3 +47,5 @@ pip-selfcheck.json
 geckodriver.log
 selenium
 tmp
+*.swo
+
