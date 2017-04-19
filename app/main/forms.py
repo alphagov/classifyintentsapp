@@ -1,12 +1,12 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, BooleanField, SelectField, SubmitField, RadioField
-from wtforms.validators import Required, Length, Email, Regexp
+from wtforms.validators import DataRequired, Length, Email, Regexp
 from wtforms import ValidationError
 from flask_pagedown.fields import PageDownField
 from ..models import Role, User, Codes, ProjectCodes, Classified
 
 class NameForm(FlaskForm):
-    name = StringField('What is your name?', validators=[Required()])
+    name = StringField('What is your name?', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
 
@@ -18,10 +18,10 @@ class EditProfileForm(FlaskForm):
 
 
 class EditProfileAdminForm(FlaskForm):
-    email = StringField('Email', validators=[Required(), Length(1, 64),
+    email = StringField('Email', validators=[DataRequired(), Length(1, 64),
                                              Email()])
     username = StringField('Username', validators=[
-        Required(), Length(1, 64), Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0,
+        DataRequired(), Length(1, 64), Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0,
                                           'Usernames must have only letters, '
                                           'numbers, dots or underscores')])
     confirmed = BooleanField('Confirmed')
@@ -48,13 +48,13 @@ class EditProfileAdminForm(FlaskForm):
             raise ValidationError('Username already in use.')
 
 class ClassifyForm(FlaskForm):
-    code = RadioField('code_radio', coerce=int, validators=[Required()])
+    code = RadioField('code_radio', coerce=int, validators=[DataRequired()])
 
     # Default the project code to 1, which should correspond to 'none'
     # Better solution would be to determine this dynamically.
     # Using ProjectCode.query.filter_by(project_code='none').first()
 
-    project_code = RadioField('project_code_radio', coerce=int, default='1', validators=[Required()])
+    project_code = RadioField('project_code_radio', coerce=int, default='1', validators=[DataRequired()])
 
     PII_boolean = BooleanField('PII_boolean')
 
