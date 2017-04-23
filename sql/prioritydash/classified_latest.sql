@@ -8,4 +8,4 @@ left join users
 on (classified.coder_id=users.id) 
 order by date_coded 
 desc limit 10;
-\watch 0.2
+\watch 1
