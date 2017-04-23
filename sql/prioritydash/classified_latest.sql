@@ -1,4 +1,4 @@
-select respondent_id, users.username, codes.code, project_codes.project_code, pip, date_coded 
+select respondent_id, users.username, codes.code, project_codes.project_code, pii, date_coded 
 from classified 
 left join codes 
 on (classified.code_id=codes.code_id) 
