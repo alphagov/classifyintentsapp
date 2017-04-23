@@ -31,6 +31,8 @@ full outer join raw
 on (a.respondent_id = raw.respondent_id)
 --where raw.start_date > '2017-04-21'
 group by (raw.respondent_id, a.code_id)
+order by raw.start_date desc
+limit 6000
 ),
 -- Now calculate how many times a survey has been classified
 total_codes as (

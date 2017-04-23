@@ -244,38 +244,39 @@ class Classified(db.Model):
         from random import seed, randint, choice, sample
         import forgery_py
         from datetime import datetime
+        from sqlalchemy.sql.expression import func
 
         seed()
         
         user_query = User.query.all()
         u_ids = [i.id for i in user_query]
-        u_ids = sample(u_ids, user_count)
+        u_ids = sample(u_ids, user_count)        
+
         codes_query = Codes.query.filter(Codes.end_date == None).all()
         project_codes_query = ProjectCodes.query.filter(Codes.end_date == None).all()
+        
         c_ids = [i.code_id for i in codes_query]
         pc_ids = [i.project_code_id for i in project_codes_query]
         
+        for i in range(int(count/user_count)):
 
-        for u in u_ids:
+            raw_query = Priority.query.first()
+            r_id = raw_query.respondent_id
+             
+            r = Classified(
+                respondent_id = r_id,
+                coder_id = choice(u_ids),
+                code_id = choice(c_ids),
+                project_code_id = choice(pc_ids),
+                pii = choice(['Yes','No']),
+                date_coded='{:%Y-%m-%d %H:%M:%S.%f}'.format(datetime.now())
+                )
 
-            raw_query = Priority.query.all()
-            r_ids = [i.respondent_id for i in raw_query]
-       
-            for i in range(int(count/user_count)):
-                r = Classified(
-                    respondent_id = choice(r_ids),
-                    coder_id = u,
-                    code_id = choice(c_ids),
-                    project_code_id = choice(pc_ids),
-                    pii = choice(['Yes','No']),
-                    date_coded='{:%Y-%m-%d %H:%M:%S.%f}'.format(datetime.now())
-                    )
-
-                db.session.add(r)
-                try:
-                    db.session.commit()
-                except IntegrityError:
-                    db.session.rollback()
+            db.session.add(r)
+            try:
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
     
     def __repr__(self):
         return '<respondent_id %s>' % self.respondent_id
