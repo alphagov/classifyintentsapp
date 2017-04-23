@@ -21,7 +21,7 @@ logic:
     - Join in start_date from raw, and order by priority and start_date
 ---    
 */
-
+drop view if exists priority; 
 -- Start with the join or raw to classified
 create view priority as (
 with codes_join 
@@ -29,6 +29,7 @@ as (select raw.respondent_id, code_id, count(*) as max
 from classified a
 full outer join raw
 on (a.respondent_id = raw.respondent_id)
+--where raw.start_date > '2017-04-21'
 group by (raw.respondent_id, a.code_id)
 ),
 -- Now calculate how many times a survey has been classified
@@ -59,7 +60,8 @@ who_coded_what as (
 select respondent_id, array_agg(distinct classified.coder_id) as coders, count(pii or null) as pii
 from classified 
 group by respondent_id
-)
+),
+final_priority as (
 -- Priority is controlled with the case when statement here
 -- The lower the number, the higher the priority.
 select  slr.respondent_id, 
@@ -90,5 +92,6 @@ on (slr.respondent_id=raw.respondent_id)
 left join who_coded_what wcw
 on (slr.respondent_id=wcw.respondent_id)
 order by priority, raw.start_date, respondent_id
-);
+)
+select * from final_priority where priority < 7);
 

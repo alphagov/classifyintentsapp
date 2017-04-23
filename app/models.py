@@ -239,38 +239,43 @@ class Classified(db.Model):
     date_coded = db.Column(db.DateTime(), nullable=False)
 
     @staticmethod
-    def generate_fake(count=1000):
+    def generate_fake(count=1000, user_count=1):
         from sqlalchemy.exc import IntegrityError
-        from random import seed, randint, choice
+        from random import seed, randint, choice, sample
         import forgery_py
+        from datetime import datetime
 
         seed()
-
-        raw_query = Raw.query.all()
-        codes_query = Codes.query.all()
-        project_codes_query = ProjectCodes.query.all()
+        
         user_query = User.query.all()
-
-        r_ids = [i.respondent_id for i in raw_query]
+        u_ids = [i.id for i in user_query]
+        u_ids = sample(u_ids, user_count)
+        codes_query = Codes.query.filter(Codes.end_date == None).all()
+        project_codes_query = ProjectCodes.query.filter(Codes.end_date == None).all()
         c_ids = [i.code_id for i in codes_query]
         pc_ids = [i.project_code_id for i in project_codes_query]
-        u_ids = [i.id for i in user_query]
-            
-        for i in range(count):
-            r = Classified(
-                respondent_id = choice(r_ids),
-                coder_id = choice(u_ids),
-                code_id = choice(c_ids),
-                project_code_id = choice(pc_ids),
-                pip = choice(['Yes','No']),
-                date_coded = forgery_py.date.date(True),
-                )
+        
 
-            db.session.add(r)
-            try:
-                db.session.commit()
-            except IntegrityError:
-                db.session.rollback()
+        for u in u_ids:
+
+            raw_query = Priority.query.all()
+            r_ids = [i.respondent_id for i in raw_query]
+       
+            for i in range(int(count/user_count)):
+                r = Classified(
+                    respondent_id = choice(r_ids),
+                    coder_id = u,
+                    code_id = choice(c_ids),
+                    project_code_id = choice(pc_ids),
+                    pii = choice(['Yes','No']),
+                    date_coded='{:%Y-%m-%d %H:%M:%S.%f}'.format(datetime.now())
+                    )
+
+                db.session.add(r)
+                try:
+                    db.session.commit()
+                except IntegrityError:
+                    db.session.rollback()
     
     def __repr__(self):
         return '<respondent_id %s>' % self.respondent_id
