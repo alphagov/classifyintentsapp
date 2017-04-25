@@ -54,7 +54,7 @@ class ClassifyForm(FlaskForm):
     # Better solution would be to determine this dynamically.
     # Using ProjectCode.query.filter_by(project_code='none').first()
 
-    project_code = RadioField('project_code_radio', coerce=int, default='1', validators=[DataRequired()])
+    project_code = RadioField('project_code_radio', coerce=int, default='0', validators=[DataRequired()])
 
     PII_boolean = BooleanField('PII_boolean')
 
