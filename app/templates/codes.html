@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+
+{% block title %}Classify Intents Survey - Codes{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1> Survey Codes</h1>
+</div>
+<table class='code_table'>
+    <tr>
+    <td class='code_table_header'>Code</td>
+    <td class='code_table_header'>Description</td>
+    </tr>
+    {% for t in table %}
+    <tr>
+        <td class='code_table_code'>{{ t.code | safe }}</td>
+        <td class='code_table_desc'>{{ t.description | safe }}</td> 
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

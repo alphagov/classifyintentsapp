@@ -106,6 +106,31 @@ div.flask-pagedown-preview h3 {
     border-bottom: 1px solid #e0e0e0;
 }
 
-.survey_question {
+.survey_response {
+    font-size: 120%;
+    width: 90%;
+    padding: 4px;
+}
+
+.code_table_header {
     font-weight: bold;
+    font-size: 140%;
+}
+
+.code_table_code {
+    width: 20%;
+    padding: 10px 4px 4px 10px;
+    font-weight: bold;
+    vertical-align: top;
+}
+
+.code_table_desc {
+    width: 80%;
+    padding: 10px 4px 4px 10px;
+    vertical-align: top;
+}
+
+.code_table {
+    width: 100%;
+    padding: 4px;
 }

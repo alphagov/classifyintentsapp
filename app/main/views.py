@@ -1,7 +1,6 @@
 from flask import render_template, redirect, url_for, abort, flash, request, current_app, make_response
 from flask_login import login_required, current_user
 from flask_sqlalchemy import get_debug_queries
-from sqlalchemy.sql.expression import func
 from . import main
 from .forms import EditProfileForm, EditProfileAdminForm, ClassifyForm
 from .. import db
@@ -127,6 +126,7 @@ def index():
 
 
 @main.route('/user/<username>')
+@login_required
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
     page = request.args.get('page', 1, type=int)
@@ -176,3 +176,9 @@ def edit_profile_admin(id):
     form.about_me.data = user.about_me
     return render_template('edit_profile.html', form=form, user=user)
 
+@main.route('/codes', methods=['GET'])
+@login_required
+def code_table():
+    codes = Codes.query.filter(Codes.end_date == None).all()
+    table = [i.__dict__ for i in codes]
+    return render_template('codes.html', table=table)
