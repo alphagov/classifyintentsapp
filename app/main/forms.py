@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, BooleanField, SelectField, SubmitField, RadioField
-from wtforms.validators import DataRequired, Length, Email, Regexp
+from wtforms.validators import DataRequired, Length, Email, Regexp, InputRequired
 from wtforms import ValidationError
 from flask_pagedown.fields import PageDownField
 from ..models import Role, User, Codes, ProjectCodes, Classified
@@ -48,13 +48,13 @@ class EditProfileAdminForm(FlaskForm):
             raise ValidationError('Username already in use.')
 
 class ClassifyForm(FlaskForm):
-    code = RadioField('code_radio', coerce=int, validators=[DataRequired()])
+    code = RadioField('code_radio', coerce=int, validators=[InputRequired()])
 
     # Default the project code to 1, which should correspond to 'none'
     # Better solution would be to determine this dynamically.
     # Using ProjectCode.query.filter_by(project_code='none').first()
 
-    project_code = RadioField('project_code_radio', coerce=int, default='0', validators=[DataRequired()])
+    project_code = RadioField('project_code_radio', coerce=int, default='0', validators=[InputRequired()])
 
     PII_boolean = BooleanField('PII_boolean')
 
