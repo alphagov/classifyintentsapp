@@ -58,9 +58,18 @@ select respondent_id, max(code_id) as coded, max(max) as max, max(ratio) as rati
 from ratio_table
 group by respondent_id
 ),
-who_coded_what as (
-select respondent_id, array_agg(distinct classified.coder_id) as coders, count(pii or null) as pii
+automated as (
+select distinct respondent_id, 1 as automated
 from classified 
+left join users 
+on (classified.coder_id = users.id)
+where users.username = 'automated'
+),
+who_coded_what as (
+select  respondent_id, 
+        array_agg(distinct classified.coder_id) as coders,
+        count(pii or null) as pii
+from classified
 group by respondent_id
 ),
 final_priority as (
@@ -74,6 +83,7 @@ select  slr.respondent_id,
         wcw.coders,
         wcw.pii,
         case 
+            when automated.automated = 1 then 4
             when wcw.pii > 0 then 8
             -- When there is a majority, but less than 3 people coded
             when (slr.ratio > 0.5 and slr.total > 1 and slr.total < 5)
@@ -93,7 +103,9 @@ left join raw
 on (slr.respondent_id=raw.respondent_id)
 left join who_coded_what wcw
 on (slr.respondent_id=wcw.respondent_id)
-order by priority, raw.start_date, respondent_id
+left join automated 
+on (slr.respondent_id=automated.respondent_id)
+order by priority, raw.start_date desc, respondent_id
 )
-select * from final_priority where priority < 7);
+select * from final_priority where priority < 10);
 
