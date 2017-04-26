@@ -10,7 +10,7 @@
         
     <h2>Read the survey response:</h2>
 
-    <p>{% if survey.comment_why_you_came %}{{ survey.comment_why_you_came | safe }} | {% endif %}
+    <p class="survey_response">{% if survey.comment_why_you_came %}{{ survey.comment_why_you_came | safe }} | {% endif %}
     {% if survey.comment_where_for_help %}{{ survey.comment_where_for_help | safe }} | {% endif %}
     {% if survey.comment_further_comments %}{{ survey.comment_further_comments | safe }}{% endif %}
     
