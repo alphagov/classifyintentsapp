@@ -83,8 +83,8 @@ select  slr.respondent_id,
         wcw.coders,
         wcw.pii,
         case 
-            when automated.automated = 1 then 4
             when wcw.pii > 0 then 8
+            when automated.automated = 1 then 4
             -- When there is a majority, but less than 3 people coded
             when (slr.ratio > 0.5 and slr.total > 1 and slr.total < 5)
             or (slr.ratio = 1 and slr.total = 2) then 3

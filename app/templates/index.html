@@ -9,27 +9,84 @@
     {% if current_user.is_authenticated %}
         
     <h2>Read the survey response:</h2>
-
-    <p class="survey_response">{% if survey.comment_why_you_came %}{{ survey.comment_why_you_came | safe }} | {% endif %}
-    {% if survey.comment_where_for_help %}{{ survey.comment_where_for_help | safe }} | {% endif %}
-    {% if survey.comment_further_comments %}{{ survey.comment_further_comments | safe }}{% endif %}
-    
+    <table class='survey_table'>
+    <tr>
+    <td colspan=2>
+    {% if survey.full_url %}
+    <h4>URL</h4>
+    {{ survey.full_url| safe }}
+    {% endif %}
+    </td>
+    </tr>
+    <tr>
+    <td>
+    {% if survey.cat_satisfaction %}
+    <h4>How satisfied were you with your visit today?</h4>
+    {{ survey.cat_satisfaction | safe }}
+    {% endif %}
+    </td>
+    <td>
+    {% if survey.cat_found_looking_for %}
+    <h4>Did you find what you were looking for?</h4>
+    {{ survey.cat_found_looking_for | safe }}
+    {% endif %}
+    </td>
+    </tr>
+    <tr>
+    <td colspan=2>
+    {% if survey.comment_why_you_came %}
+    <h4>Why did you come to GOV.UK today?</h4>
+    {{ survey.comment_why_you_came | safe }}
+    {% endif %}
+    </td>
+    </tr>
+    <tr>
+    <td colspan=2>    
+    {% if survey.comment_where_for_help %}
+    <h4>Where else did you go for help?</h4>
+    {{ survey.comment_where_for_help | safe }}
+    {% endif %}
+    </td>
+    </tr>
+    <tr>
+    <td colspan=2>
+    {% if survey.comment_further_comments %}
+    <h4>Do you have any further comments?</h4>
+    {{ survey.comment_further_comments | safe }}
+    {% endif %}
+    </td>
+    </tr>
+    <tr>
+    <td class="survey_table_cell">
     <h2>Apply a Code:</h2>
     <form method="POST">
     {{ form.hidden_tag() }}
     <h5>Which CODE do you think best describes these comments?</h5>
     {{ form.code() }}
+    </td>
+    <td class="survey_table_cell">
     <h2>Apply a Project Code:</h2>
-    <h5>Which PROJECT CODE can be applied to the survey if any?</h5>
+    <h5>Which PROJECT CODE can be applied to the survey if any?</h5> 
     {{ form.project_code() }}
+    </td>
+    </tr>
+    <tr>
+    <td colspan=2 class="survey_table_cell">
     <h2>Is there PII?<h2>
     <h5>Is there Personally Identifying Information (PII) in this survey?</h5>
     {{ form.PII_boolean() }} YES
-    <br><br>
+    </td>
+    </tr>
+    <tr>
+    <td>
+    <br>
     {{ form.submit() }}
     </form>
- 
-{% else %}
+    </td>
+    </tr>
+    </table>
+
+    {% else %}
     
     <a href="{{ url_for('auth.login') }}">Please log in here</a>
 
