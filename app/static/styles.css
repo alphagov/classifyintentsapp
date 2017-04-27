@@ -108,13 +108,10 @@ div.flask-pagedown-preview h3 {
 
 .survey_response {
     font-size: 140%;
-    width: 90%;
-    padding: 4px;
 }
 
 .code_table_header {
     font-weight: bold;
-    font-size: 140%;
 }
 
 .code_table_code {
@@ -138,10 +135,13 @@ div.flask-pagedown-preview h3 {
 .survey_table {
     width: 100%;
     padding: 4px;
-    border-radius: 25px;
 }
 
 .survey_table_cell {
     vertical-align: top;
     padding: 4px;
+}
+
+.code_input {
+    font-size: 140%;
 }

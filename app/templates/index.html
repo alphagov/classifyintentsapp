@@ -8,73 +8,73 @@
 <div>
     {% if current_user.is_authenticated %}
         
-    <h2>Read the survey response:</h2>
+    <h3 class='code_table_header'>Read the survey response:</h3>
     <table class='survey_table'>
     <tr>
-    <td colspan=2>
+    <td colspan=2 class='survey_table_cell'>
     {% if survey.full_url %}
-    <h4>URL</h4>
-    {{ survey.full_url| safe }}
+    <h4 class='code_table_header'>URL</h4>
+    <p class='survey_response'>{{ survey.full_url| safe }}</p>
     {% endif %}
     </td>
     </tr>
     <tr>
-    <td>
+    <td class='survey_table_cell'>
     {% if survey.cat_satisfaction %}
-    <h4>How satisfied were you with your visit today?</h4>
-    {{ survey.cat_satisfaction | safe }}
+    <h4 class='code_table_header'>How satisfied were you with your visit today?</h4>
+    <p class='survey_response'>{{ survey.cat_satisfaction | safe }}</p>
     {% endif %}
     </td>
-    <td>
+    <td class='survey_table_cell'>
     {% if survey.cat_found_looking_for %}
-    <h4>Did you find what you were looking for?</h4>
-    {{ survey.cat_found_looking_for | safe }}
+    <h4 class='code_table_header'>Did you find what you were looking for?</h4>
+    <p class='survey_response'>{{ survey.cat_found_looking_for | safe }}</p>
     {% endif %}
     </td>
     </tr>
     <tr>
-    <td colspan=2>
+    <td colspan=2 class='survey_table_cell'>
     {% if survey.comment_why_you_came %}
-    <h4>Why did you come to GOV.UK today?</h4>
-    {{ survey.comment_why_you_came | safe }}
+    <h4 class='code_table_header'>Why did you come to GOV.UK today?</h4>
+    <p class='survey_response'>{{ survey.comment_why_you_came | safe }}</p>
     {% endif %}
     </td>
     </tr>
     <tr>
-    <td colspan=2>    
+    <td colspan=2 class='survey_table_cell'>
     {% if survey.comment_where_for_help %}
-    <h4>Where else did you go for help?</h4>
-    {{ survey.comment_where_for_help | safe }}
+    <h4 class='code_table_header'>Where else did you go for help?</h4>
+    <p class='survey_response'>{{ survey.comment_where_for_help | safe }}</p>
     {% endif %}
     </td>
     </tr>
     <tr>
-    <td colspan=2>
+    <td colspan=2 class='survey_table_cell'>
     {% if survey.comment_further_comments %}
-    <h4>Do you have any further comments?</h4>
-    {{ survey.comment_further_comments | safe }}
+    <h4 class='code_table_header'>Do you have any further comments?</h4>
+    <p class='survey_response'>{{ survey.comment_further_comments | safe }}</p>
     {% endif %}
     </td>
     </tr>
     <tr>
     <td class="survey_table_cell">
-    <h2>Apply a Code:</h2>
+    <h3 class='code_table_header'>Apply a Code:</h3>
     <form method="POST">
     {{ form.hidden_tag() }}
     <h5>Which CODE do you think best describes these comments?</h5>
-    {{ form.code() }}
+    {{ form.code(class_='code_input') }}
     </td>
     <td class="survey_table_cell">
-    <h2>Apply a Project Code:</h2>
-    <h5>Which PROJECT CODE can be applied to the survey if any?</h5> 
-    {{ form.project_code() }}
+    <h3 class='code_table_header'>Apply a Project Code:</h3>
+    <h5>Do the comments relate to a GDS service?</h5> 
+    {{ form.project_code(class_='code_input') }}
     </td>
     </tr>
     <tr>
     <td colspan=2 class="survey_table_cell">
-    <h2>Is there PII?<h2>
+    <h3 class='code_table_header'>Is there PII?<h3>
     <h5>Is there Personally Identifying Information (PII) in this survey?</h5>
-    {{ form.PII_boolean() }} YES
+    {{ form.PII_boolean(class_='code_input') }} YES
     </td>
     </tr>
     <tr>
