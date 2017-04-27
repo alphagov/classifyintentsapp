@@ -107,7 +107,7 @@ div.flask-pagedown-preview h3 {
 }
 
 .survey_response {
-    font-size: 140%;
+    font-size: 120%;
 }
 
 .code_table_header {
@@ -143,5 +143,8 @@ div.flask-pagedown-preview h3 {
 }
 
 .code_input {
-    font-size: 140%;
+    font-size: 100%;
+    padding: 2px;
+    padding-left: 0px;
 }
+
