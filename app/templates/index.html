@@ -14,7 +14,7 @@
     <td colspan=2 class='survey_table_cell'>
     {% if survey.full_url %}
     <h4 class='code_table_header'>URL</h4>
-    <p class='survey_response'>{{ survey.full_url| safe }}</p>
+    <a class='survey_response' href='{{"https://gov.uk" + survey.full_url | safe}}' target='_blank'>{{ survey.full_url| safe }}</a>
     {% endif %}
     </td>
     </tr>
