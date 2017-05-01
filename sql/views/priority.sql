@@ -83,19 +83,22 @@ select  slr.respondent_id,
         wcw.coders,
         wcw.pii,
         case 
+            -- When there is pii
             when wcw.pii > 0 then 8
+            -- When the survey was coded by a machine
             when automated.automated = 1 then 4
-            -- When there is a majority, but less than 3 people coded
+            -- When there is a majority, but only two people agreed so far
+            -- When five people have coded and still agreement, then will be 9
             when (slr.ratio > 0.5 and slr.total > 1 and slr.total < 5)
             or (slr.ratio = 1 and slr.total = 2) then 3
             -- When there is not a majority and five or fewer codes applied
-            when slr.ratio <= 0.5 and slr.total <= 5 then 1
+            when slr.ratio <= 0.5 and slr.total <= 4 then 1
             -- When the survey has not been coded before
             when slr.total = 1 and slr.ratio = 1 and slr.coded is null then 2
             -- When the survey has been coded just once
             when slr.total = 1 and slr.ratio = 1 and slr.coded is not null then 1
             -- When the survey is difficult to code (no majority after 5)
-            when slr.total > 5 and slr.ratio < 0.5 then 7
+            when slr.total > 4 and slr.ratio < 0.5 then 7
             else 9
         end as priority
 from survey_level_ratio slr
