@@ -32,7 +32,7 @@ on (a.respondent_id = raw.respondent_id)
 --where raw.start_date > '2017-04-21'
 group by (raw.respondent_id, a.code_id)
 order by raw.start_date desc
-limit 6000
+limit 5000
 ),
 -- Now calculate how many times a survey has been classified
 total_codes as (
@@ -76,7 +76,7 @@ final_priority as (
 -- Priority is controlled with the case when statement here
 -- The lower the number, the higher the priority.
 select  slr.respondent_id, 
-        raw.start_date, 
+        date_trunc('month', raw.start_date) as month,
         slr.max,
         slr.ratio,
         slr.total,
@@ -108,7 +108,7 @@ left join who_coded_what wcw
 on (slr.respondent_id=wcw.respondent_id)
 left join automated 
 on (slr.respondent_id=automated.respondent_id)
-order by priority, start_date desc, random()
+order by month desc, priority, random()
 )
-select * from final_priority where priority < 10);
+select * from final_priority);
 

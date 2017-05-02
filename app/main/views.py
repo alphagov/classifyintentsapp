@@ -40,7 +40,7 @@ def new_survey(user, model):
     # Filter by 7 will remove all recalcitrant surveys, pii, 
     # And those already happily classified.
 
-    priority = model.query.filter(Priority.priority<7).all()
+    priority = model.query.filter(Priority.priority<6).all()
 
     priority_list = [i for i in priority if i.coders is None or user not in i.coders]
     

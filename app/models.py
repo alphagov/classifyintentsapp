@@ -284,7 +284,7 @@ class Classified(db.Model):
 class Raw(db.Model):
     __tablename__ = 'raw'
     respondent_id = db.Column(db.BigInteger(), primary_key=True, index=True)
-    collector_id = db.Column(db.BigInteger())
+    collector_id = db.Column(db.String())
     start_date = db.Column(db.DateTime(), index=True)
     end_date = db.Column(db.DateTime(), index=True)
     ip_address = db.Column(db.String())
@@ -486,7 +486,7 @@ class ProjectCodes(db.Model):
 class Priority(db.Model):
     __tablename__ = 'priority'
     respondent_id = db.Column(db.BigInteger(), primary_key=True)
-    start_date = db.Column(db.DateTime())
+    month = db.Column(db.DateTime())
     max = db.Column(db.BigInteger())
     ratio = db.Column(db.Numeric())
     total = db.Column(db.Integer())
