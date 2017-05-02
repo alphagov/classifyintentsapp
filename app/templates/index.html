@@ -8,7 +8,6 @@
 <div>
     {% if current_user.is_authenticated %}
         
-    <h3 class='code_table_header'>Read the survey response:</h3>
     <table class='survey_table'>
     <tr>
     <td colspan=2 class='survey_table_cell'>
@@ -54,25 +53,20 @@
     <h4 class='code_table_header'>Do you have any further comments?</h4>
     <p class='survey_response'>{{ survey.comment_further_comments | safe }}</p>
     {% endif %}
+    <hr>
     </td>
     </tr>
     <tr>
     <td class="survey_table_cell">
-    <h3 class='code_table_header'>Apply a Code:</h3>
     <form method="POST">
     {{ form.hidden_tag() }}
     <h5>Which CODE do you think best describes these comments?</h5>
     {{ form.code(class_='code_input') }}
     </td>
     <td class="survey_table_cell">
-    <h3 class='code_table_header'>Apply a Project Code:</h3>
     <h5>Do the comments relate to a GDS service?</h5> 
     {{ form.project_code(class_='code_input') }}
-    </td>
-    </tr>
-    <tr>
-    <td colspan=2 class="survey_table_cell">
-    <h3 class='code_table_header'>Is there PII?<h3>
+    <br>
     <h5>Is there Personally Identifying Information (PII) in this survey?</h5>
     {{ form.PII_boolean(class_='code_input') }} YES
     </td>

@@ -108,7 +108,7 @@ left join who_coded_what wcw
 on (slr.respondent_id=wcw.respondent_id)
 left join automated 
 on (slr.respondent_id=automated.respondent_id)
-order by priority, raw.start_date desc, respondent_id
+order by priority, start_date desc, random()
 )
 select * from final_priority where priority < 10);
 
