@@ -86,7 +86,7 @@ select  slr.respondent_id,
             -- When there is pii
             when wcw.pii > 0 then 8
             -- When the survey was coded by a machine
-            when automated.automated = 1 then 4
+            when automated.automated = 1 then 6
             -- When there is a majority, but only two people agreed so far
             -- When five people have coded and still agreement, then will be 9
             when (slr.ratio > 0.5 and slr.total > 1 and slr.total < 5)

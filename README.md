@@ -74,6 +74,7 @@ Any view could be created in its place with a new set of criteria as required, b
 |1|Any survey for which there is not yet a majority (>=50%) of users assigning a single code, and where <= 5 users have coded the survey|
 |2|New surveys that have not been coded|
 |3|A survey for which a majority (>=50%) has been found, but <5 people have coded the survey.|
+|6|The survey has been automatically been classified by algorithm.|
 |7|Survey is recalcitrant: when >5 people have coded the survey and there still is not majority.
 |8|Survey contains Personally Identifiable Information (has been tagged as such once or more times)|
 |9|There is a majority, and more than 5 people have coded the survey.|
