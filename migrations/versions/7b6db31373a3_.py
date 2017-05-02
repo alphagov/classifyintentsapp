@@ -29,7 +29,7 @@ def upgrade():
     op.create_index(op.f('ix_codes_code_id'), 'codes', ['code_id'], unique=False)
     op.create_table('priority',
     sa.Column('respondent_id', sa.BigInteger(), nullable=False),
-    sa.Column('start_date', sa.DateTime(), nullable=True),
+    sa.Column('month', sa.DateTime(), nullable=True),
     sa.Column('max', sa.BigInteger(), nullable=True),
     sa.Column('ratio', sa.Numeric(), nullable=True),
     sa.Column('total', sa.Integer(), nullable=True),
@@ -48,7 +48,7 @@ def upgrade():
     op.create_index(op.f('ix_project_codes_project_code_id'), 'project_codes', ['project_code_id'], unique=False)
     op.create_table('raw',
     sa.Column('respondent_id', sa.BigInteger(), nullable=False),
-    sa.Column('collector_id', sa.BigInteger(), nullable=True),
+    sa.Column('collector_id', sa.String(), nullable=True),
     sa.Column('start_date', sa.DateTime(), nullable=True),
     sa.Column('end_date', sa.DateTime(), nullable=True),
     sa.Column('ip_address', sa.String(), nullable=True),
