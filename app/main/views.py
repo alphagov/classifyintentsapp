@@ -36,8 +36,8 @@ def server_shutdown():
 
 def new_survey(user, model):
 
-    # This query can be slow is slow.
-    # Filter by 7 will remove all recalcitrant surveys, pii, 
+    # This query can be slow.
+    # Filter by 6 will remove all automated and recalcitrant surveys, pii, 
     # And those already happily classified.
 
     priority = model.query.filter(Priority.priority<6).all()

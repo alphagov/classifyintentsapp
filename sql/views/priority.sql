@@ -108,7 +108,7 @@ left join who_coded_what wcw
 on (slr.respondent_id=wcw.respondent_id)
 left join automated 
 on (slr.respondent_id=automated.respondent_id)
-order by month desc, priority, random()
+order by month desc, priority
 )
 select * from final_priority);
 
