@@ -28,7 +28,7 @@ class FlaskClientTestCase(unittest.TestCase):
     def test_register_and_login(self):
         # register a new account
         response = self.client.post(url_for('auth.register'), data={
-            'email': 'john@example.com',
+            'email': 'testemail@digital.cabinet-office.gov.uk',
             'username': 'john',
             'password': 'cat',
             'password2': 'cat'
@@ -37,7 +37,7 @@ class FlaskClientTestCase(unittest.TestCase):
 
         # login with the new account
         response = self.client.post(url_for('auth.login'), data={
-            'email': 'john@example.com',
+            'email': 'testemail@digital.cabinet-office.gov.uk',
             'password': 'cat'
         }, follow_redirects=True)
         self.assertTrue(re.search(b'Hello,\s+john!', response.data))
@@ -45,7 +45,7 @@ class FlaskClientTestCase(unittest.TestCase):
             b'You have not confirmed your account yet' in response.data)
 
         # send a confirmation token
-        user = User.query.filter_by(email='john@example.com').first()
+        user = User.query.filter_by(email='testemail@digital.cabinet-office.gov.uk').first()
         token = user.generate_confirmation_token()
         response = self.client.get(url_for('auth.confirm', token=token),
                                    follow_redirects=True)
@@ -55,3 +55,17 @@ class FlaskClientTestCase(unittest.TestCase):
         # log out
         response = self.client.get(url_for('auth.logout'), follow_redirects=True)
         self.assertTrue(b'You have been logged out' in response.data)
+
+    def test_register_with_non_gds_email(self):
+        # register a new account
+        response = self.client.post(url_for('auth.register'), data={
+            'email': 'john@anotherdomain.com',
+            'username': 'john',
+            'password': 'cat',
+            'password2': 'cat'
+        })
+        # Response status code will not be 302 (should be 200), as the email
+        # address did not validate.
+        self.assertTrue(response.status_code != 302)
+        self.assertTrue(len(User.query.all()) == 0)
+        
