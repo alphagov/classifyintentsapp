@@ -21,7 +21,7 @@ class RegistrationForm(FlaskForm):
             DataRequired(),
             Length(1, 64),
             Email()
-            #Regexp(regex = '.*\@digital\.cabinet\-office\.gov\.uk', message='Must be a valid @digital.cabinet-office.gov.uk address')
+            Regexp(regex = '.*\@digital\.cabinet\-office\.gov\.uk', message='Must be a valid @digital.cabinet-office.gov.uk address')
             ]
         )
 
