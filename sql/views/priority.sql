@@ -1,26 +1,3 @@
-/*
----
-name: Priority View
-filename: priority.sql
-logic:
-    - Join the classfied with the raw table and count total of each code
-      applied to each survey (respondent_id) to give the codes_join cte.
-    - Calculate the total number of codes applied to each survey to give
-      total_codes cte.
-    - Join these two ctes and calculate the ratio codes applied:
-      count of each code/total number of codes.
-    - Get the maximum ratio, total, and max count for any code in the 
-      survey_level_ratio cte.
-    - Apply prioritisation rules to the survey_level_ratio cte:
-        - When not coded: 3
-        - When coded once: 1
-        - When coded without majority (up to total 5): 1
-        - When coded without majority (more than 5): 8
-        - When coded with majority but less than 3 coders: 2
-        - When majority found: 9
-    - Join in start_date from raw, and order by priority and start_date
----    
-*/
 drop view if exists priority; 
 -- Start with the join or raw to classified
 create view priority as (
