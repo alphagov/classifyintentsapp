@@ -20,7 +20,7 @@ class RegistrationForm(FlaskForm):
         validators=[
             DataRequired(),
             Length(1, 64),
-            Email()
+            Email(),
             Regexp(regex = '.*\@digital\.cabinet\-office\.gov\.uk', message='Must be a valid @digital.cabinet-office.gov.uk address')
             ]
         )
