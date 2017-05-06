@@ -4,7 +4,7 @@ import time
 import unittest
 from selenium import webdriver
 from app import create_app, db
-from app.models import Role, User, Raw, Classified
+from app.models import Role, User, Raw, Classified, Codes, ProjectCodes
 from app.queryloader import query_loader
 
 class SeleniumTestCase(unittest.TestCase):
@@ -35,6 +35,8 @@ class SeleniumTestCase(unittest.TestCase):
             Role.insert_roles()
             User.generate_fake(10)
             Raw.generate_fake(10)
+            Codes.generate_fake()
+            ProjectCodes.generate_fake()
 
             # Create the priority view
             query = query_loader('sql/views/priority.sql')
@@ -94,11 +96,33 @@ class SeleniumTestCase(unittest.TestCase):
         self.client.find_element_by_name('password').send_keys('cat')
         self.client.find_element_by_name('submit').click()
         #self.assertTrue(re.search('Which\sCODE', self.client.page_source))
-
+    
         # navigate to the user's profile page
         self.client.find_element_by_link_text('Profile').click()
         self.assertTrue('<h1>john</h1>' in self.client.page_source)
 
-        #self.client.find_element_by_link_text('Home').click()
-        #self.client.find_element_by_css_selector("//*[(@id = 'code-0')]").click()
-        #self.client.find_element_by_name('submit').click()
+    def test_classify_a_survey(self):
+
+        self.client.find_element_by_link_text('Home').click()
+        self.client.find_element_by_id('code-0').click()
+        self.client.find_element_by_id('project_code-0').click()
+        time.sleep(1)
+        self.client.find_element_by_name('submit').click()
+
+        # Check that a survey was classified     
+
+        classified_count = Classified.query.count()
+        self.assertTrue(classified_count == 1)
+
+        # Check that the flashed id corresponds with the survey that was classified
+
+        survey_id = Classified.query.first()
+        survey_id = survey_id.respondent_id
+        
+        flash_id = re.search('Survey\s(\d+)\sclassified', self.client.page_source)
+        flash_id = int(flash_id.group(1))
+        
+        self.assertTrue(survey_id == flash_id)
+
+
+
