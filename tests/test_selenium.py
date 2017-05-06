@@ -5,7 +5,7 @@ import unittest
 from selenium import webdriver
 from app import create_app, db
 from app.models import Role, User, Raw, Classified
-
+from app.queryloader import query_loader
 
 class SeleniumTestCase(unittest.TestCase):
     client = None
@@ -36,6 +36,11 @@ class SeleniumTestCase(unittest.TestCase):
             User.generate_fake(10)
             Raw.generate_fake(10)
 
+            # Create the priority view
+            query = query_loader('sql/views/priority.sql')
+            db.session.execute(query)
+            db.session.commit()
+
             # add an administrator user
             admin_role = Role.query.filter_by(permissions=0xff).first()
             admin = User(email='john@example.com',
@@ -58,6 +63,8 @@ class SeleniumTestCase(unittest.TestCase):
             cls.client.close()
 
             # destroy database
+            db.session.execute('drop view priority;')
+            db.session.commit()
             db.drop_all()
             db.session.remove()
 
@@ -91,3 +98,7 @@ class SeleniumTestCase(unittest.TestCase):
         # navigate to the user's profile page
         self.client.find_element_by_link_text('Profile').click()
         self.assertTrue('<h1>john</h1>' in self.client.page_source)
+
+        #self.client.find_element_by_link_text('Home').click()
+        #self.client.find_element_by_css_selector("//*[(@id = 'code-0')]").click()
+        #self.client.find_element_by_name('submit').click()

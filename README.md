@@ -89,6 +89,8 @@ Yout bet. Tests are in the <tests/> folder. Either run `python manage.py test` t
 
 Tests must be run on a postgre data base, so the `TEST_DATABASE_URL` environmental variable must be set in `.env`.
 
+To complete tests using selenium, you will need to download the [chromedriver](https://chromedriver.storage.googleapis.com) and load it into your path, otherwise these tesst will pass without failing.
+
 ### Common Problems
 
 The following error `AttributeError: 'NoneType' object has no attribute 'drivername'` indicates that the `DEV_DATABASE_URL` environmental variable has not been set.

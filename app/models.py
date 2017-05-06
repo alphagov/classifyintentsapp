@@ -494,7 +494,7 @@ class Priority(db.Model):
     priority = db.Column(db.Integer())
     
     def __repr__(self):
-        return '<respondent_id %s date %s priority %s>' % (self.respondent_id, self.start_date, self.priority)
+        return '<respondent_id %s date %s priority %s>' % (self.respondent_id, self.month, self.priority)
 
 
 class Urls(db.Model):
