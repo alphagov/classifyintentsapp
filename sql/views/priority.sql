@@ -1,4 +1,5 @@
-drop view if exists priority; 
+drop table if exists priority;
+drop view if exists priority;
 -- Start with the join or raw to classified
 create view priority as (
 with codes_join 

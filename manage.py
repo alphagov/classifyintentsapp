@@ -78,8 +78,9 @@ def deploy():
     """Run deployment tasks."""
     from flask_migrate import upgrade
     from app.models import Role, User
-    
+    from app.queryloader import query_loader
     # migrate database to latest revision
+ 
     upgrade()
 
     # create user roles
@@ -87,6 +88,11 @@ def deploy():
     Raw.generate_fake()
     Codes.generate_fake()
     ProjectCodes.generate_fake()
+
+    # Create priority view
+    query = query_loader('sql/views/priority.sql')
+    db.session.execute(query)
+    db.session.commit()
 
 if __name__ == '__main__':
     manager.run()
