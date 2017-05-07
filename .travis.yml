@@ -4,10 +4,16 @@ sudo: false
 git:
     depth: 3
 python:
-  - "3.5"
-  - "3.6"
+    - "3.5"
+    - "3.6"
 # command to install dependencies
 install:
-  - "pip install -r requirements.txt"
-# command to run tests
-script: "python manage.py test"
+    - pip install -r requirements.txt
+    - pip install codecov
+
+script: 
+    - python manage.py test
+
+after_success:
+    - codecov
+
