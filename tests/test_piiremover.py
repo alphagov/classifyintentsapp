@@ -25,6 +25,25 @@ class TestCleanUrls(unittest.TestCase):
 
             feedback = 'This is not a real national insurance number %s!' % i
 
-            self.assertTrue(pii_remover(feedback) == success)           
+            self.assertTrue(pii_remover(feedback,phone=None) == success)           
 
             
+    def test_pii_remover_catches_phone_numbers(self): 
+        
+        '''
+        See this link for details on generating fake phone numbers
+        https://www.ofcom.org.uk/phones-telecoms-and-internet/
+        information-for-industry/numbering/numbers-for-drama
+        '''
+
+        test_cases = ['02079461234','0207 946 1234','+442079461234',
+            '07700 900123','+447700900123','08081 570123','0909 8790123',
+            '(03069) 990123','03069 990123']
+        
+        success = 'This is not a real telephone number %s!' % '[PII Removed]'
+        
+        for i in test_cases:
+
+            feedback = 'This is not a real telephone number %s!' % i
+
+            self.assertTrue(pii_remover(feedback,ni=None) == success)           
