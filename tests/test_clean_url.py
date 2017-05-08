@@ -44,7 +44,7 @@ class TestCleanUrls(unittest.TestCase):
         self.assertTrue(foo.section1 == 'site-nav')
         self.assertTrue(foo.org0 is None)
         
-    def test_clean_url_on_govt_world(self):
+#    def test_clean_url_on_govt_world(self):
 
         bar = Raw.query.get(2)
         foo = clean_url(bar, Urls)
@@ -53,7 +53,7 @@ class TestCleanUrls(unittest.TestCase):
         self.assertTrue(foo.section0 is None)
         self.assertTrue(foo.org0 == 'Foreign & Commonwealth Office')
 
-    def test_clean_url_on_govt_publications(self):
+#    def test_clean_url_on_govt_publications(self):
 
         bar = Raw.query.get(3)
         foo = clean_url(bar, Urls)
@@ -62,7 +62,7 @@ class TestCleanUrls(unittest.TestCase):
         self.assertTrue(foo.section0 is None)
         self.assertTrue(foo.org0 is None)
 
-    def test_clean_url_on_govt_guidance(self):
+#    def test_clean_url_on_govt_guidance(self):
         bar = Raw.query.get(4)
         foo = clean_url(bar, Urls)
         self.assertTrue(foo.full_url == bar.full_url)
@@ -71,7 +71,7 @@ class TestCleanUrls(unittest.TestCase):
         self.assertTrue(foo.org0 is None)
 
 
-    def test_clean_url_on_browse(self):
+#    def test_clean_url_on_browse(self):
         bar = Raw.query.get(5)
         foo = clean_url(bar, Urls)
         self.assertTrue(foo.full_url == bar.full_url)
@@ -79,7 +79,7 @@ class TestCleanUrls(unittest.TestCase):
         self.assertTrue(foo.section0 == 'births-deaths-marriages')
         self.assertTrue(foo.org0 is None)
 
-    def test_clean_url_on_site_nav0(self):
+#    def test_clean_url_on_site_nav0(self):
         bar = Raw.query.get(6)
         foo = clean_url(bar, Urls)
         self.assertTrue(foo.full_url == bar.full_url)
@@ -88,7 +88,7 @@ class TestCleanUrls(unittest.TestCase):
         self.assertTrue(foo.section1 == 'site-nav')
         self.assertTrue(foo.org0 is None)
 
-    def test_clean_url_on_site_nav1(self):
+#    def test_clean_url_on_site_nav1(self):
         bar = Raw.query.get(7)
         foo = clean_url(bar, Urls)
         self.assertTrue(foo.full_url == bar.full_url)
@@ -97,7 +97,7 @@ class TestCleanUrls(unittest.TestCase):
         self.assertTrue(foo.section1 == 'site-nav')
         self.assertTrue(foo.org0 is None)
 
-    def test_clean_url_on_contact(self):
+#    def test_clean_url_on_contact(self):
         bar = Raw.query.get(8)
         foo = clean_url(bar, Urls)
         self.assertTrue(foo.full_url == bar.full_url)
