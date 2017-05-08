@@ -25,7 +25,7 @@ class TestCleanUrls(unittest.TestCase):
 
             feedback = 'This is not a real national insurance number %s!' % i
 
-            self.assertTrue(pii_remover(feedback,phone=None) == success)           
+            self.assertTrue(pii_remover(feedback) == success)           
 
             
     def test_pii_remover_catches_phone_numbers(self): 
@@ -46,4 +46,20 @@ class TestCleanUrls(unittest.TestCase):
 
             feedback = 'This is not a real telephone number %s!' % i
 
-            self.assertTrue(pii_remover(feedback,ni=None) == success)           
+            self.assertTrue(pii_remover(feedback,ni=None,number_plates=None) == success)           
+
+
+    def test_pii_remover_catches_number_plates(self): 
+        
+        '''
+        '''
+
+        test_cases = ['1234567890123456','1234567890123']
+        
+        success = 'This is not a real credit card number %s!' % '[PII Removed]'
+        
+        for i in test_cases:
+
+            feedback = 'This is not a real credit card number %s!' % i
+
+            self.assertTrue(pii_remover(feedback,ni=None,phone=None) == success)           
