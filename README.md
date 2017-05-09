@@ -27,6 +27,7 @@ The following variables should be set in `.env`:
 * __DEV_DATABASE_URL__: URL of the database used for development
 * __TEST_DATABASE_URL__: URL of test database.
 * __DATABASE_URL__: URL of production database.
+* __SECRET_KEY__: Key for Cross Site Forgery Protection.
 
 Note that `DATABASE_URL` is subject to change if deployed on heroku, and for this reason should be set dynamically following 12 factor app principles with:
 
