@@ -25,6 +25,7 @@ The following variables should be set in `.env`:
 * __MAIL_USERNAME__: Email username used for sending confirmations when signing up.
 * __MAIL_PASSWORD__: Password for above email account (probably a gmail account)
 * __DEV_DATABASE_URL__: URL of the database used for development
+* __TEST_DATABASE_URL__: URL of test database.
 * __DATABASE_URL__: URL of production database.
 
 Note that `DATABASE_URL` is subject to change if deployed on heroku, and for this reason should be set dynamically following 12 factor app principles with:
@@ -34,6 +35,8 @@ DATABASE_URL=$(heroku config:get DATABASE_URL -a classifyintents)
 ```
 
 See [heroku docs](https://devcenter.heroku.com/articles/connecting-to-heroku-postgres-databases-from-outside-of-heroku) for more details.
+
+Note that you will need to set a postgres URI for the DEV and TEST database even if you don't intent to use them, otherwise this can cause errors during set up.
 
 ### Setting up the app
 
