@@ -1,11 +1,11 @@
 from re import sub, compile
 
-ni = compile('[a-zA-Z]{2}(?:\s*\d\s*){6}[a-zA-Z]?')
-phone = compile('(((\+44\s?\d{4}|\(?0\d{4}\)?)\s?\d{3}\s?\d{3})|((\+44\s?\d{3}|\(?0\d{3}\)?)\s?\d{3}\s?\d{4})|((\+44\s?\d{2}|\(?0\d{2}\)?)\s?\d{4}\s?\d{4}))(\s?\#(\d{4}|\d{3}))?')
-vrp = compile('((?:[a-zA-Z]{2}\s?[0-9]{2}\s?[a-zA-Z]{3})|(?:[a-zA-Z]{3}\s?\d{4}))')
-passports = compile('[0-9]{9,10}GBR[0-9]{7}[U,M,F]{1}[0-9]{7}')
-dates = compile('((?:\d{1,2})(?:rd|nd|th)?([\/\.\-\ ])((?:[0-9]{1,2})|(?:\D{3})|(?:January|February|March|April|May|June|July|August|Septeber|October|November|December))(?:[\/\.\-\ ])\d{2,4})')
-digits = compile('\d')
+ni = '[a-zA-Z]{2}(?:\s*\d\s*){6}[a-zA-Z]?'
+phone = '(((\+44\s?\d{4}|\(?0\d{4}\)?)\s?\d{3}\s?\d{3})|((\+44\s?\d{3}|\(?0\d{3}\)?)\s?\d{3}\s?\d{4})|((\+44\s?\d{2}|\(?0\d{2}\)?)\s?\d{4}\s?\d{4}))(\s?\#(\d{4}|\d{3}))?'
+vrp = '((?:[a-zA-Z]{2}\s?[0-9]{2}\s?[a-zA-Z]{3})|(?:[a-zA-Z]{3}\s?\d{4}))'
+passports = '[0-9]{9,10}GBR[0-9]{7}[U,M,F]{1}[0-9]{7}'
+dates = '((?:\d{1,2})(?:rd|nd|th)?([\/\.\-\ ])((?:[0-9]{1,2})|(?:\D{3})|(?:January|February|March|April|May|June|July|August|Septeber|October|November|December))(?:[\/\.\-\ ])\d{2,4})'
+digits = '\d'
 
 def pii_remover(
         x, 

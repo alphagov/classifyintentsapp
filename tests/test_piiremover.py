@@ -57,7 +57,7 @@ class TestPIIRemoval(unittest.TestCase):
         for i in test_cases:
 
             feedback = 'This is not a real vehicle registration plate number %s!' % i
-
+            
             self.assertTrue(pii_remover(feedback) == success)           
 
 
