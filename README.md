@@ -12,11 +12,11 @@ A blog about the survey is available on [gov.uk](https://gdsdata.blog.gov.uk/201
 
 The underlying framework of the app is based heavily on the micro blogging site by [Miguel Grinberg](https://github.com/miguelgrinberg/flasky) which features in the O'Reilly book [Flask Web Development](http://www.flaskbook.com).
 
-## Gettting started
+## Getting started
 
-### Environmental variables
+### Environment variables
 
-It is adviseable to use [autoenv](https://github.com/kennethreitz/autoenv) to manage environmental variables. 
+It is adviseable to use [autoenv](https://github.com/kennethreitz/autoenv) to manage environmental variables.
 
 Install with: `pip install autoenv`, and then set all environmental variables in a `.env` files.
 
@@ -49,7 +49,7 @@ Note that you will need to set a postgres URI for the DEV and TEST database even
 Following changes to the database migrations can be made with:
 
 ```
-python manage.py db migrate 
+python manage.py db migrate
 python manage.py db upgrade
 ```
 
@@ -62,8 +62,8 @@ To generate fake data, first create an app specific shell with `python manage.py
 Raw.generate_fake()
 Codes.generate_fake()
 ProjectCodes.generate_fake()
+User.generate_fake()
 Classified.generate_fake()
-Users.generate_fake()
 ```
 
 You can specify the number of fake records to be insert with an integer argument (e.g. 100) to each method.
@@ -82,7 +82,7 @@ db.session.execute(query)
 db.session.commit()
 ```
 
-### How new surveys are select (the prioritisation view)
+### How new surveys are selected (the prioritisation view)
 
 How surveys should be prioritised to users is controlled by the prioritisation view.
 Any view could be created in its place with a new set of criteria as required, but at present the prioritisation works on the basis that at least half of all the people coding a survey need to agree before a code can be set. The prioritisation rules are set below:
