@@ -231,10 +231,10 @@ def load_user(user_id):
 class Classified(db.Model):
     __tablename__ = 'classified'
     classified_id = db.Column(db.Integer(), primary_key=True, index=True)
-    respondent_id = db.Column(db.BigInteger(), db.ForeignKey('raw.respondent_id'), index=True) 
+    respondent_id = db.Column(db.BigInteger(), db.ForeignKey('raw.respondent_id'), index=True)
     coder_id = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=False, index=True)
     code_id = db.Column(db.Integer(), db.ForeignKey('codes.code_id'), nullable=False, index=True)
-    project_code_id = db.Column(db.Integer(), db.ForeignKey('project_codes.project_code_id'), index=True) 
+    project_code_id = db.Column(db.Integer(), db.ForeignKey('project_codes.project_code_id'), index=True)
     pii = db.Column(db.Boolean(), index=True)
     date_coded = db.Column(db.DateTime(), nullable=False)
 
@@ -247,22 +247,22 @@ class Classified(db.Model):
         from sqlalchemy.sql.expression import func
 
         seed()
-        
+
         user_query = User.query.all()
         u_ids = [i.id for i in user_query]
-        u_ids = sample(u_ids, user_count)        
+        u_ids = sample(u_ids, user_count)
 
         codes_query = Codes.query.filter(Codes.end_date == None).all()
         project_codes_query = ProjectCodes.query.filter(Codes.end_date == None).all()
-        
+
         c_ids = [i.code_id for i in codes_query]
         pc_ids = [i.project_code_id for i in project_codes_query]
-        
+
         for i in range(int(count/user_count)):
 
-            raw_query = Priority.query.first()
+            raw_query = Raw.query.first()
             r_id = raw_query.respondent_id
-             
+
             r = Classified(
                 respondent_id = r_id,
                 coder_id = choice(u_ids),
@@ -277,7 +277,7 @@ class Classified(db.Model):
                 db.session.commit()
             except IntegrityError:
                 db.session.rollback()
-    
+
     def __repr__(self):
         return '<respondent_id %s>' % self.respondent_id
 
@@ -320,9 +320,9 @@ class Raw(db.Model):
         import requests
         import forgery_py
         import time
-    
+
         # Create a list of 100 urls
-        
+
         print('Looking up %s random gov.uk pages' % count)
         print('This may take some time...')
 
@@ -342,9 +342,9 @@ class Raw(db.Model):
         from sqlalchemy.exc import IntegrityError
         from random import seed, randint, choice
         import forgery_py
-        
-        # Load a random list of gov.uk urls 
-            
+
+        # Load a random list of gov.uk urls
+
         with open('govukurls.txt') as f:
             govukurls = f.read().splitlines()
 
@@ -370,7 +370,7 @@ class Raw(db.Model):
                 cat_anywhere_else_help = choice(['Yes','No']),
                 comment_other_else_help = forgery_py.lorem_ipsum.sentence(),
                 comment_where_for_help = forgery_py.lorem_ipsum.sentence(),
-                comment_further_comments = forgery_py.lorem_ipsum.sentences(3)  
+                comment_further_comments = forgery_py.lorem_ipsum.sentences(3)
                 )
 
             db.session.add(r)
@@ -378,7 +378,7 @@ class Raw(db.Model):
                 db.session.commit()
             except IntegrityError:
                 db.session.rollback()
-    
+
     def __repr__(self):
         return '<respondent_id %s>' % self.respondent_id
 
@@ -402,7 +402,7 @@ class Codes(db.Model):
 
         seed()
 
-# Add a 'none' class to ensure the default value in the form 
+# Add a 'none' class to ensure the default value in the form
 # works as expected
 
         r = Codes(
@@ -431,7 +431,7 @@ class Codes(db.Model):
                 db.session.commit()
             except IntegrityError:
                 db.session.rollback()
-    
+
 
 class ProjectCodes(db.Model):
     __tablename__ = 'project_codes'
@@ -452,8 +452,8 @@ class ProjectCodes(db.Model):
         import forgery_py
 
         seed()
- 
-# Add a 'none' class to ensure the default value in the form 
+
+# Add a 'none' class to ensure the default value in the form
 # works as expected
 
         r = ProjectCodes(
@@ -468,7 +468,7 @@ class ProjectCodes(db.Model):
             db.session.commit()
         except IntegrityError:
             db.session.rollback()
- 
+
         for i in range(count):
             r = ProjectCodes(
                 project_code=forgery_py.lorem_ipsum.word(),
@@ -492,7 +492,7 @@ class Priority(db.Model):
     total = db.Column(db.Integer())
     coders = db.Column(db.ARRAY(db.Integer()))
     priority = db.Column(db.Integer())
-    
+
     def __repr__(self):
         return '<respondent_id %s date %s priority %s>' % (self.respondent_id, self.month, self.priority)
 
@@ -512,7 +512,7 @@ class Urls(db.Model):
     org3 = db.Column(db.String(), index=True)
     org4 = db.Column(db.String(), index=True)
     lookup_date = db.Column(db.DateTime(), index=True)
-    
+
     def __repr__(self):
         return '<full_url %s org %s section %s date %s >' % (self.full_url, self.org0, self.section0, self.lookup_date)
 
@@ -528,7 +528,7 @@ class Urls(db.Model):
         #ulrs_full_urls = [i for i in urls_full_urls]
 
         all_full_urls = Raw.query.filter_by().all()
-        
+
         r = ProjectCodes(
             project_code='none',
             description='none',
@@ -541,7 +541,7 @@ class Urls(db.Model):
             db.session.commit()
         except IntegrityError:
             db.session.rollback()
- 
+
         for i in range(count):
             r = ProjectCodes(
                 project_code=forgery_py.lorem_ipsum.word(),
