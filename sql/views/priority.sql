@@ -14,7 +14,7 @@ on (a.respondent_id = raw.respondent_id)
 -- If we need to prioritise a particular date period, if can be
 -- done here by specifying a date range
 --where raw.start_date > '2017-04-21'
-group by (raw.respondent_id, a.code_id)
+group by raw.respondent_id, a.code_id
 order by raw.start_date desc
 -- Limit to the most recent 5000 surveys. This may be required
 -- otherwise the prioritisation view takes about a second to be
