@@ -48,5 +48,10 @@ geckodriver.log
 selenium
 tmp
 *.swo
+share
+pyvenv.cfg
+share
 
+# CloudFoundry
 .cfignore
+manifest.yml
