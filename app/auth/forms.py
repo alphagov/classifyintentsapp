@@ -3,7 +3,7 @@ from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import DataRequired, Length, Email, Regexp, EqualTo
 from wtforms import ValidationError
 from ..models import User
-
+import safe
 
 class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Length(1, 64),
@@ -12,6 +12,20 @@ class LoginForm(FlaskForm):
     remember_me = BooleanField('Keep me logged in')
     submit = SubmitField('Log In')
 
+class Password(object):
+    '''
+    Custome password strength validator using safe
+    '''
+    def __init__(self, message=None):
+        if not message:
+            message = u'Your password is too weak. Please try again with a more secure password.'
+        self.message = message
+
+    def __call__(self, form, field):
+        p = field.data
+        strength = safe.check(p)
+        if strength.strength not in ['medium','strong']:
+            raise ValidationError(self.message)
 
 class RegistrationForm(FlaskForm):
 
@@ -21,18 +35,23 @@ class RegistrationForm(FlaskForm):
             DataRequired(),
             Length(1, 64),
             Email(),
-            Regexp(regex = '.*\@digital\.cabinet\-office\.gov\.uk', message='Must be a valid @digital.cabinet-office.gov.uk address')
+            Regexp(regex = '.*\@digital\.cabinet\-office\.gov\.uk', message='Must be a valid @digital.cabinet-office.gov.uk address'),
+            Password()
             ]
         )
 
     username = StringField('Name', validators=[
-        DataRequired(), Length(1, 64), Regexp('^[A-Za-z][A-Za-z0-9_.\ ]*$', 0,
+        DataRequired(), Length(6, 64), Regexp('^[A-Za-z][A-Za-z0-9_.\ ]*$', 0,
                                           'Usernames must have only letters, '
                                           'numbers, dots or underscores')])
     password = PasswordField('Password', validators=[
         DataRequired(), EqualTo('password2', message='Passwords must match.')])
     password2 = PasswordField('Confirm password', validators=[DataRequired()])
     submit = SubmitField('Register')
+    
+    def validate_password(self,field):
+        if True:
+            raise ValidationError('Password is too easy to guess. Please include a mix of numbers and letters.')
 
     def validate_email(self, field):
         if User.query.filter_by(email=field.data).first():
@@ -58,10 +77,10 @@ class PasswordResetRequestForm(FlaskForm):
 
 
 class PasswordResetForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired(), Length(1, 64),
-                                             Email()])
+    email = StringField('Email', validators=[
+        DataRequired(), Length(1, 64), Email()])
     password = PasswordField('New Password', validators=[
-        DataRequired(), EqualTo('password2', message='Passwords must match')])
+        DataRequired(), EqualTo('password2', message='Passwords must match'), Password()])
     password2 = PasswordField('Confirm password', validators=[DataRequired()])
     submit = SubmitField('Reset Password')
 
