@@ -260,7 +260,7 @@ class Classified(db.Model):
 
         for i in range(int(count/user_count)):
 
-            raw_query = Raw.query.first()
+            raw_query = Priority.query.first()
             r_id = raw_query.respondent_id
 
             r = Classified(
