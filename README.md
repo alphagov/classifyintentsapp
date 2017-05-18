@@ -62,6 +62,7 @@ To generate fake data, first create an app specific shell with `python manage.py
 Raw.generate_fake()
 Codes.generate_fake()
 ProjectCodes.generate_fake()
+Role.insert_roles()
 User.generate_fake()
 ```
 Before creating fake classification data, it is necessary to create the priority view by running the query <sql/views/priority.sql>.
