@@ -12,13 +12,13 @@ class LoginForm(FlaskForm):
     remember_me = BooleanField('Keep me logged in')
     submit = SubmitField('Log In')
 
-class Password(object):
+class PasswordStrength(object):
     '''
-    Custome password strength validator using safe
+    Custom password strength validator using safe.
     '''
     def __init__(self, message=None):
         if not message:
-            message = u'Your password is too weak. Please try again with a more secure password.'
+            message = 'Your password is too weak. Please try again with a more secure password.'
         self.message = message
 
     def __call__(self, form, field):
@@ -36,7 +36,7 @@ class RegistrationForm(FlaskForm):
             Length(1, 64),
             Email(),
             Regexp(regex = '.*\@digital\.cabinet\-office\.gov\.uk', message='Must be a valid @digital.cabinet-office.gov.uk address'),
-            Password()
+            PasswordStrength()
             ]
         )
 
@@ -49,10 +49,6 @@ class RegistrationForm(FlaskForm):
     password2 = PasswordField('Confirm password', validators=[DataRequired()])
     submit = SubmitField('Register')
     
-    def validate_password(self,field):
-        if True:
-            raise ValidationError('Password is too easy to guess. Please include a mix of numbers and letters.')
-
     def validate_email(self, field):
         if User.query.filter_by(email=field.data).first():
             raise ValidationError('Email already registered.')
@@ -80,7 +76,7 @@ class PasswordResetForm(FlaskForm):
     email = StringField('Email', validators=[
         DataRequired(), Length(1, 64), Email()])
     password = PasswordField('New Password', validators=[
-        DataRequired(), EqualTo('password2', message='Passwords must match'), Password()])
+        DataRequired(), EqualTo('password2', message='Passwords must match'), PasswordStrength()])
     password2 = PasswordField('Confirm password', validators=[DataRequired()])
     submit = SubmitField('Reset Password')
 
