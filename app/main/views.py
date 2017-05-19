@@ -187,3 +187,11 @@ def code_table():
     codes = Codes.query.filter(Codes.end_date == None).all()
     table = [i.__dict__ for i in codes]
     return render_template('codes.html', table=table)
+
+@main.route('/users', methods=['GET'])
+@login_required
+@admin_required
+def auth_table():
+    users = User.query.outerjoin(Role, User.role_id==Role.id).all()
+    table = [i.__dict__ for i in users]
+    return render_template('users.html', table=table)
