@@ -115,14 +115,14 @@ class UserModelTestCase(unittest.TestCase):
     def test_user_roles_and_permissions(self):
         user_id = Role.query.filter(Role.name=='User').with_entities(Role.id).scalar()
         u = User(email='john@example.com', password='cat', role_id=user_id)
-        self.assertFalse(u.is_administrator)
+        self.assertFalse(u.is_administrator())
         self.assertTrue(u.can(Permission.CLASSIFY))
         self.assertFalse(u.can(Permission.ADMINISTER))
 
     def test_admin_roles_and_permissions(self):
         admin_id = Role.query.filter(Role.name=='Administrator').with_entities(Role.id).scalar()
         u = User(email='john@example.com', password='cat', role_id=admin_id)
-        self.assertTrue(u.is_administrator)
+        self.assertTrue(u.is_administrator())
         self.assertTrue(u.can(Permission.CLASSIFY))
         self.assertTrue(u.can(Permission.ADMINISTER))
 
