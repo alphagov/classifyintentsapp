@@ -30,15 +30,15 @@ class FlaskClientTestCase(unittest.TestCase):
         response = self.client.post(url_for('auth.register'), data={
             'email': 'testemail@digital.cabinet-office.gov.uk',
             'username': 'john',
-            'password': 'cat',
-            'password2': 'cat'
+            'password': 'jhsfaasf7376GHH',
+            'password2': 'jhsfaasf7376GHH'
         })
         self.assertTrue(response.status_code == 302)
 
         # login with the new account
         response = self.client.post(url_for('auth.login'), data={
             'email': 'testemail@digital.cabinet-office.gov.uk',
-            'password': 'cat'
+            'password': 'jhsfaasf7376GHH'
         }, follow_redirects=True)
         self.assertTrue(re.search(b'Hello,\s+john!', response.data))
         self.assertTrue(
@@ -61,8 +61,8 @@ class FlaskClientTestCase(unittest.TestCase):
         response = self.client.post(url_for('auth.register'), data={
             'email': 'john@anotherdomain.com',
             'username': 'john',
-            'password': 'cat',
-            'password2': 'cat'
+            'password': 'jhsfaasf7376GHH',
+            'password2': 'jhsfaasf7376GHH'
         })
         # Response status code will not be 302 (should be 200), as the email
         # address did not validate.

@@ -35,17 +35,21 @@ class RegistrationForm(FlaskForm):
             DataRequired(),
             Length(1, 64),
             Email(),
-            Regexp(regex = '.*\@digital\.cabinet\-office\.gov\.uk', message='Must be a valid @digital.cabinet-office.gov.uk address'),
-            PasswordStrength()
+            Regexp(regex = '.*\@digital\.cabinet\-office\.gov\.uk', message='Must be a valid @digital.cabinet-office.gov.uk address')
+            
             ]
         )
 
     username = StringField('Name', validators=[
-        DataRequired(), Length(6, 64), Regexp('^[A-Za-z][A-Za-z0-9_.\ ]*$', 0,
+        DataRequired(), Length(1, 64), Regexp('^[A-Za-z][A-Za-z0-9_.\ ]*$', 0,
                                           'Usernames must have only letters, '
                                           'numbers, dots or underscores')])
     password = PasswordField('Password', validators=[
-        DataRequired(), EqualTo('password2', message='Passwords must match.')])
+        DataRequired(), 
+        EqualTo('password2', message='Passwords must match.'),
+        Length(8,64, message='Password must be at least 8 characters in length.'),
+        PasswordStrength()
+        ])
     password2 = PasswordField('Confirm password', validators=[DataRequired()])
     submit = SubmitField('Register')
     
