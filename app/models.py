@@ -314,6 +314,7 @@ class Raw(db.Model):
         import requests
         import forgery_py
         import time
+        from app.urllookup import random_url
 
         # Create a list of 100 urls
 
