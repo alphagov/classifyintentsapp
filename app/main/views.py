@@ -4,7 +4,7 @@ from flask_sqlalchemy import get_debug_queries
 from . import main
 from .forms import EditProfileForm, EditProfileAdminForm, ClassifyForm
 from .. import db
-from ..models import Permission, Role, User, Classified, Raw, Codes, ProjectCodes, Priority
+from ..models import Permission, Role, User, Classified, Raw, Codes, ProjectCodes, Priority, Leaders, DailyLeaders, WeeklyLeaders
 from ..decorators import admin_required, permission_required
 from datetime import datetime, date
 from functools import wraps
@@ -195,3 +195,19 @@ def auth_table():
     users = User.query.outerjoin(Role, User.role_id==Role.id).all()
     table = [i.__dict__ for i in users]
     return render_template('users.html', table=table)
+
+@main.route('/leaders', methods=['GET'])
+@login_required
+@permission_required(Permission.CLASSIFY)
+def leader_table():
+    all_time_leaders = Leaders.query.all()
+    all_table = [i.__dict__ for i in all_time_leaders]
+    
+    daily_leaders = DailyLeaders.query.all()
+    daily_table = [i.__dict__ for i in daily_leaders]
+    
+    weekly_leaders = WeeklyLeaders.query.all()
+    weekly_table = [i.__dict__ for i in weekly_leaders]
+    
+    return render_template('leaders.html', all_table=all_table,
+            weekly_table=weekly_table, daily_table=daily_table)

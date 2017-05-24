@@ -1,9 +1,5 @@
 -- Use only in-line comments in this file, as they will be
 -- identified and removed by query_loader().
--- Remove pre-existing table and view which may have been 
--- created by db.create_all()
-drop table if exists priority;
-drop view if exists priority;
 -- Start with the join of raw to classified
 create view priority as (
 with codes_join 

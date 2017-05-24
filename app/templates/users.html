@@ -18,7 +18,7 @@
     <tr>
         <td>{{ t.email | safe }}</td>
         <td>{{ t.username | safe }}</td>
-        <td><a href='edit-profile/{{t.id}}'>{{ t.role_id | safe }}</a></td> 
+        <td><a href='edit-profile/{{t.id | safe}}'>{{ t.role_id | safe }}</a></td> 
         <td>{{ t.last_seen | safe }}</td> 
     </tr>
     {% endfor %}

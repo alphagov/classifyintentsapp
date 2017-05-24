@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+
+{% block title %}Classify App - Leaderboard{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1> Leaderboard</h1>
+</div>
+<h2>Today</h2>
+<table class='leaders_table'>
+    <tr>
+    <td class='code_table_header'>Rank</td>
+    <td class='code_table_header'>User Name</td>
+    <td class='code_table_header'>Score</td>
+    </tr>
+    {% for t in daily_table %}
+    <tr>
+        <td>{{ t.rank | safe }}</td>
+        <td><a href='user/{{t.username | safe}}'>{{ t.username | safe }}</a></td>
+        <td>{{ t.n | safe }}</td> 
+    </tr>
+    {% endfor %}
+</table>
+<h2>This week</h2>
+<table class='leaders_table'>
+    <tr>
+    <td class='code_table_header'>Rank</td>
+    <td class='code_table_header'>User Name</td>
+    <td class='code_table_header'>Score</td>
+    </tr>
+    {% for t in weekly_table %}
+    <tr>
+        <td>{{ t.rank | safe }}</td>
+        <td><a href='user/{{t.username | safe}}'>{{ t.username | safe }}</a></td>
+        <td>{{ t.n | safe }}</td> 
+    </tr>
+    {% endfor %}
+</table>
+<h2>All time</h2>
+<table class='leaders_table'>
+    <tr>
+    <td class='code_table_header'>Rank</td>
+    <td class='code_table_header'>User Name</td>
+    <td class='code_table_header'>Score</td>
+    </tr>
+    {% for t in all_table %}
+    <tr>
+        <td>{{ t.rank | safe }}</td>
+        <td><a href='user/{{t.username | safe}}'>{{ t.username | safe }}</a></td>
+        <td>{{ t.n | safe }}</td> 
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

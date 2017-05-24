@@ -550,3 +550,21 @@ class Urls(db.Model):
                 db.session.commit()
             except IntegrityError:
                 db.session.rollback()
+
+class Leaders(db.Model):
+    __tablename__ = 'leaders'
+    rank = db.Column(db.Integer(), primary_key=True)
+    username = db.Column(db.String(), index=True)
+    n = db.Column(db.Integer())
+
+class DailyLeaders(db.Model):
+    __tablename__ = 'daily_leaders'
+    rank = db.Column(db.Integer(), primary_key=True)
+    username = db.Column(db.String(), index=True)
+    n = db.Column(db.Integer())
+
+class WeeklyLeaders(db.Model):
+    __tablename__ = 'weekly_leaders'
+    rank = db.Column(db.Integer(), primary_key=True)
+    username = db.Column(db.String(), index=True)
+    n = db.Column(db.Integer())
