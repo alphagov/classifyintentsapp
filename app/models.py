@@ -235,42 +235,55 @@ class Classified(db.Model):
     @staticmethod
     def generate_fake(count=1000, user_count=1):
         from sqlalchemy.exc import IntegrityError
-        from random import seed, randint, choice, sample
+        from random import seed, randint, sample
+        from numpy.random import choice
         import forgery_py
         from datetime import datetime
         from sqlalchemy.sql.expression import func
 
         seed()
 
+        # Load all users into a list and sample n=user_count users
+
         user_query = User.query.all()
         u_ids = [i.id for i in user_query]
         u_ids = sample(u_ids, user_count)
 
+        # Load codes and project codes for application to surveys
+
         codes_query = Codes.query.filter(Codes.end_date == None).all()
         project_codes_query = ProjectCodes.query.filter(Codes.end_date == None).all()
 
+        # Convert to lists
+
         c_ids = [i.code_id for i in codes_query]
         pc_ids = [i.project_code_id for i in project_codes_query]
+        
+        # Cycle through each user and classify as a human would
 
-        for i in range(int(count/user_count)):
+        for j in range(user_count):
+            for i in range(int(count/user_count)):
+    
+                # Choose from surveys that have not already been classified as either
+                # PII, difficult, or already classified well.
 
-            raw_query = Priority.query.first()
-            r_id = raw_query.respondent_id
+                raw_query = Priority.query.filter(Priority.priority<6).first()
+                r_id = raw_query.respondent_id
 
-            r = Classified(
-                respondent_id = r_id,
-                coder_id = choice(u_ids),
-                code_id = choice(c_ids),
-                project_code_id = choice(pc_ids),
-                pii = choice(['Yes','No']),
-                date_coded='{:%Y-%m-%d %H:%M:%S.%f}'.format(datetime.now())
-                )
+                r = Classified(
+                    respondent_id = r_id,
+                    coder_id = int(choice(u_ids)),
+                    code_id = int(choice(c_ids)),
+                    project_code_id = int(choice(pc_ids)),
+                    pii = choice(a=['Yes','No'], p=[0.001, 0.999]),
+                    date_coded='{:%Y-%m-%d %H:%M:%S.%f}'.format(datetime.now())
+                    )
 
-            db.session.add(r)
-            try:
-                db.session.commit()
-            except IntegrityError:
-                db.session.rollback()
+                db.session.add(r)
+                try:
+                    db.session.commit()
+                except IntegrityError:
+                    db.session.rollback()
 
     def __repr__(self):
         return '<respondent_id %s>' % self.respondent_id
