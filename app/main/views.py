@@ -31,10 +31,13 @@ def server_shutdown():
     shutdown()
     return 'Shutting down...'
 
-# Function to select the next survey: ensures that a coder doesn't see the same
-# survey more than once.
 
 def new_survey(user, model):
+    '''
+    Select the next survey: ensures that a coder doesn't see the same 
+    survey more than once.
+    
+    '''
 
     # This query can be slow.
     # Filter by 6 will remove all automated and recalcitrant surveys, pii, 
@@ -62,6 +65,7 @@ def new_survey(user, model):
 
 @main.route('/', methods=['GET', 'POST'])
 @login_required
+@permission_required(Permission.CLASSIFY)
 def index():
 
     # Select a survey from the priority view.
@@ -99,7 +103,8 @@ def index():
         
             if coded_today%10 == 0:
             
-                exclaim = ['Well Done!', 'Great!', 'Congratulations!', 'Great Work!', 'Boom!', 'Amazeballs!', 'Amazing!']
+                exclaim = ['Well Done!', 'Great!', 'Congratulations!', 'Great Work!', 
+                        'Boom!', 'Amazeballs!', 'Amazing!']
 
                 flash('%s You have coded %d surveys today!' % (choice(exclaim), coded_today))
 
@@ -182,3 +187,11 @@ def code_table():
     codes = Codes.query.filter(Codes.end_date == None).all()
     table = [i.__dict__ for i in codes]
     return render_template('codes.html', table=table)
+
+@main.route('/users', methods=['GET'])
+@login_required
+@admin_required
+def auth_table():
+    users = User.query.outerjoin(Role, User.role_id==Role.id).all()
+    table = [i.__dict__ for i in users]
+    return render_template('users.html', table=table)

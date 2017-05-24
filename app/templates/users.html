@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+
+{% block title %}Classify App - Authorise New Users{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h1> Authorise new Users</h1>
+</div>
+<table class='code_table'>
+    <tr>
+    <td class='code_table_header'>Email</td>
+    <td class='code_table_header'>User Name</td>
+    <td class='code_table_header'>Role</td>
+    <td class='code_table_header'>Last Seen</td
+    </tr>
+    {% for t in table %}
+    <tr>
+        <td>{{ t.email | safe }}</td>
+        <td>{{ t.username | safe }}</td>
+        <td><a href='edit-profile/{{t.id}}'>{{ t.role_id | safe }}</a></td> 
+        <td>{{ t.last_seen | safe }}</td> 
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

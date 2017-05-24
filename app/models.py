@@ -11,14 +11,14 @@ from . import db, login_manager
 from random import choice
 
 class Permission:
-    FOLLOW = 0x01
-    COMMENT = 0x02
-    WRITE_ARTICLES = 0x04
-    MODERATE_COMMENTS = 0x08
+    CLASSIFY = 0x01
     ADMINISTER = 0x80
 
 
 class Role(db.Model):
+    '''
+    Insert roles into the database
+    '''
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True)
@@ -29,13 +29,7 @@ class Role(db.Model):
     @staticmethod
     def insert_roles():
         roles = {
-            'User': (Permission.FOLLOW |
-                     Permission.COMMENT |
-                     Permission.WRITE_ARTICLES, True),
-            'Moderator': (Permission.FOLLOW |
-                          Permission.COMMENT |
-                          Permission.WRITE_ARTICLES |
-                          Permission.MODERATE_COMMENTS, False),
+            'User': (Permission.CLASSIFY, False),
             'Administrator': (0xff, False)
         }
         for r in roles:
@@ -320,6 +314,7 @@ class Raw(db.Model):
         import requests
         import forgery_py
         import time
+        from app.urllookup import random_url
 
         # Create a list of 100 urls
 
