@@ -198,7 +198,7 @@ def auth_table():
 
 @main.route('/leaders', methods=['GET'])
 @login_required
-@permission_required(Permission.CLASSIFY)
+@permission_required(Permission.GAMIFY)
 def leader_table():
     all_time_leaders = Leaders.query.all()
     all_table = [i.__dict__ for i in all_time_leaders]

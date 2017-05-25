@@ -12,6 +12,7 @@ from random import choice
 
 class Permission:
     CLASSIFY = 0x01
+    GAMIFY = 0x02
     ADMINISTER = 0x80
 
 
@@ -30,6 +31,8 @@ class Role(db.Model):
     def insert_roles():
         roles = {
             'User': (Permission.CLASSIFY, False),
+            'User-Gamify': (Permission.CLASSIFY | 
+                Permission.GAMIFY, False),
             'Administrator': (0xff, False)
         }
         for r in roles:
@@ -180,15 +183,6 @@ class User(UserMixin, db.Model):
             self.email.encode('utf-8')).hexdigest()
         return '{url}/{hash}?s={size}&d={default}&r={rating}'.format(
             url=url, hash=hash, size=size, default=default, rating=rating)
-
-    def to_json(self):
-        json_user = {
-            'url': url_for('api.get_user', id=self.id, _external=True),
-            'username': self.username,
-            'member_since': self.member_since,
-            'last_seen': self.last_seen
-        }
-        return json_user
 
     def generate_auth_token(self, expiration):
         s = Serializer(current_app.config['SECRET_KEY'],

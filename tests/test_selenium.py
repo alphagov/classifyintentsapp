@@ -39,7 +39,10 @@ class SeleniumTestCase(unittest.TestCase):
             ProjectCodes.generate_fake()
 
             # Create the priority view
+            db.session.execute('drop table priority, leaders, weekly_leaders, daily_leaders;')
             query = query_loader('sql/views/priority.sql')
+            db.session.execute(query)
+            query = query_loader('sql/views/leaders.sql')
             db.session.execute(query)
             db.session.commit()
 
@@ -49,6 +52,20 @@ class SeleniumTestCase(unittest.TestCase):
                          username='john', password='cat',
                          role=admin_role, confirmed=True)
             db.session.add(admin)
+
+            # Add a user (without gamification)
+
+            user = User(email='user@example.com',
+                         username='user', password='cat',
+                         role=admin_role, confirmed=True)
+            db.session.add(user)
+
+            # Add a user (with gamification)
+
+            user_gamify = User(email='user_gamify@example.com',
+                         username='user_gamify', password='cat',
+                         role=admin_role, confirmed=True)
+            db.session.add(user_gamify)
             db.session.commit()
 
             # start the Flask server in a thread
@@ -65,7 +82,7 @@ class SeleniumTestCase(unittest.TestCase):
             cls.client.close()
 
             # destroy database
-            db.session.execute('drop view priority;')
+            db.session.execute('drop view priority, leaders, weekly_leaders, daily_leaders;')
             db.session.commit()
             db.drop_all()
             db.session.remove()
@@ -103,6 +120,9 @@ class SeleniumTestCase(unittest.TestCase):
 
     def test_classify_a_survey(self):
 
+        # navigate to the user's profile page
+        self.client.find_element_by_link_text('Profile').click()
+        self.assertTrue('<h1>user</h1>' in self.client.page_source)
         self.client.find_element_by_link_text('Home').click()
         self.client.find_element_by_id('code-0').click()
         self.client.find_element_by_id('project_code-0').click()
