@@ -57,6 +57,8 @@ Then:
     db.session.add(u)
     db.session.commit()
 
+Alternatively set the `FLASKY_ADMIN` environmental variable to your email address, and then register with the application running locally. This will automatically grant you the administrator role.
+
 ### Setting up the app on Heroku
 
 * Set up a heroku pipeline to detect pushes on master to github
