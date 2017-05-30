@@ -16,10 +16,10 @@
     </tr>
     {% for t in table %}
     <tr>
-        <td>{{ t.email | safe }}</td>
-        <td>{{ t.username | safe }}</td>
-        <td><a href='edit-profile/{{t.id | safe}}'>{{ t.role_id | safe }}</a></td> 
-        <td>{{ t.last_seen | safe }}</td> 
+        <td>{{ t.email }}</td>
+        <td>{{ t.username }}</td>
+        <td><a href='edit-profile/{{ t.id }}'>{{ t.role_id }}</a></td> 
+        <td>{{ t.last_seen }}</td> 
     </tr>
     {% endfor %}
 </table>

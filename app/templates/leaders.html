@@ -16,9 +16,9 @@
     </tr>
     {% for t in daily_table %}
     <tr>
-        <td>{{ t.rank | safe }}</td>
-        <td><a href='user/{{t.username | safe}}'>{{ t.username | safe }}</a></td>
-        <td>{{ t.n | safe }}</td> 
+        <td>{{ t.rank }}</td>
+        <td><a href='user/{{ t.username }}'>{{ t.username }}</a></td>
+        <td>{{ t.n }}</td> 
     </tr>
     {% endfor %}
 </table>
@@ -31,9 +31,9 @@
     </tr>
     {% for t in weekly_table %}
     <tr>
-        <td>{{ t.rank | safe }}</td>
-        <td><a href='user/{{t.username | safe}}'>{{ t.username | safe }}</a></td>
-        <td>{{ t.n | safe }}</td> 
+        <td>{{ t.rank }}</td>
+        <td><a href='user/{{ t.username }}'>{{ t.username }}</a></td>
+        <td>{{ t.n }}</td> 
     </tr>
     {% endfor %}
 </table>
@@ -46,9 +46,9 @@
     </tr>
     {% for t in all_table %}
     <tr>
-        <td>{{ t.rank | safe }}</td>
-        <td><a href='user/{{t.username | safe}}'>{{ t.username | safe }}</a></td>
-        <td>{{ t.n | safe }}</td> 
+        <td>{{ t.rank }}</td>
+        <td><a href='user/{{ t.username }}'>{{ t.username }}</a></td>
+        <td>{{ t.n }}</td> 
     </tr>
     {% endfor %}
 </table>

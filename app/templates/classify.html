@@ -10,11 +10,11 @@
     <h2>Survey:</h2>
     {% if survey.box1 %}
     <h5 class='survey_question'>Question 1:</h5>
-    <p>{{ survey.box1 | safe }}</p>
+    <p>{{ survey.box1 }}</p>
     <h5 class='survey_question'>Question 2:</h5>
-    <p>{{ survey.box2 | safe }}</p>
+    <p>{{ survey.box2 }}</p>
     <h5 class='survey_question'>Question 3:</h5>
-    <p>{{ survey.box3 | safe }}</p>
+    <p>{{ survey.box3 }}</p>
     {% endif %}
 </div>
 {{ wtf.quick_form(form) }}

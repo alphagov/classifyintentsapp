@@ -15,7 +15,7 @@
                 {% endif %}
                 {% if moderate or not comment.disabled %}
                     {% if comment.body_html %}
-                        {{ comment.body_html | safe }}
+                        {{ comment.body_html }}
                     {% else %}
                         {{ comment.body }}
                     {% endif %}
