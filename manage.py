@@ -80,9 +80,6 @@ def deploy():
     Codes.generate_fake()
     ProjectCodes.generate_fake()
 
-    db.session.execute('drop table priority; drop table leaders\
-            drop table weekly_leaders; drop table daily_leaders')
-
     # Create priority view
     query = query_loader('sql/views/priority.sql')
     db.session.execute(query)
