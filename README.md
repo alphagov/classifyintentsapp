@@ -54,7 +54,7 @@ Then:
 
     from app.models import User, Role
     admin_id = Role.query.filter(Role.name=='Administrator').with_entities(Role.id).scalar()
-    u = User(username='admin', email='admin@admin.com', password='pass', role=Role.query.get(admin_id))
+    u = User(username='admin', email='admin@admin.com', password='pass', role=Role.query.get(admin_id), confirmed=True)
     db.session.add(u)
     db.session.commit()
 
