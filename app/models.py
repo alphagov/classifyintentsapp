@@ -262,16 +262,21 @@ class Classified(db.Model):
                 # PII, difficult, or already classified well.
 
                 raw_query = Priority.query.filter(Priority.priority<6).first()
-                r_id = raw_query.respondent_id
+                if raw_query:
+                    r_id = raw_query.respondent_id
 
-                r = Classified(
-                    respondent_id = r_id,
-                    coder_id = int(choice(u_ids)),
-                    code_id = int(choice(c_ids)),
-                    project_code_id = int(choice(pc_ids)),
-                    pii = choice(a=['Yes','No'], p=[0.001, 0.999]),
-                    date_coded='{:%Y-%m-%d %H:%M:%S.%f}'.format(datetime.now())
-                    )
+                    r = Classified(
+                        respondent_id = r_id,
+                        coder_id = int(choice(u_ids)),
+                        code_id = int(choice(c_ids)),
+                        project_code_id = int(choice(pc_ids)),
+                        pii = choice(a=['Yes','No'], p=[0.001, 0.999]),
+                        date_coded='{:%Y-%m-%d %H:%M:%S.%f}'.format(datetime.now())
+                        )
+                else: 
+                    pass
+                    print('No surveys with the right priority remaining to be classified. Try running\
+                            Raw.generate_fake() to create more fake surveys before re-running Classified.generate_fake().')
 
                 db.session.add(r)
                 try:
