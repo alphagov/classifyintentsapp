@@ -27,16 +27,6 @@ def upgrade():
     sa.PrimaryKeyConstraint('code_id')
     )
     op.create_index(op.f('ix_codes_code_id'), 'codes', ['code_id'], unique=False)
-    op.create_table('priority',
-    sa.Column('respondent_id', sa.BigInteger(), nullable=False),
-    sa.Column('month', sa.DateTime(), nullable=True),
-    sa.Column('max', sa.BigInteger(), nullable=True),
-    sa.Column('ratio', sa.Numeric(), nullable=True),
-    sa.Column('total', sa.Integer(), nullable=True),
-    sa.Column('coders', sa.ARRAY(sa.Integer()), nullable=True),
-    sa.Column('priority', sa.Integer(), nullable=True),
-    sa.PrimaryKeyConstraint('respondent_id')
-    )
     op.create_table('project_codes',
     sa.Column('project_code_id', sa.Integer(), nullable=False),
     sa.Column('project_code', sa.String(length=50), nullable=True),
