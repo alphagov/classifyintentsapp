@@ -80,7 +80,7 @@ def deploy():
 
 @manager.command
 def populate():
-    """Run deployment tasks."""
+    """Populate database with fake data."""
     from flask_migrate import upgrade
     from app.models import Role, User, Codes, ProjectCodes, Classified
     # migrate database to latest revision
