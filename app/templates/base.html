@@ -28,7 +28,10 @@
                 <li><a href="{{ url_for('main.user', username=current_user.username) }}">Profile</a></li>
                 <li><a href="{{ url_for('main.code_table') }}">Codes</a></li>
                 {% endif %}
-                {% if current_user.is_administrator %}
+                {% if current_user.can(Permission.GAMIFY) %}
+                <li><a href="{{ url_for('main.leader_table') }}">Leaderboard</a></li>
+                {% endif %}
+                {% if current_user.is_administrator() %}
                 <li><a href="{{ url_for('main.auth_table') }}">Users</a></li>
                 {% endif %}
             </ul>

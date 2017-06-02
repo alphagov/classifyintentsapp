@@ -132,6 +132,11 @@ div.flask-pagedown-preview h3 {
     padding: 4px;
 }
 
+.leaders_table {
+    width: 50%;
+    padding: 4px;
+}
+
 .survey_table {
     width: 100%;
     padding: 4px;

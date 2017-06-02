@@ -12,6 +12,7 @@ from random import choice
 
 class Permission:
     CLASSIFY = 0x01
+    GAMIFY = 0x02
     ADMINISTER = 0x80
 
 
@@ -30,6 +31,8 @@ class Role(db.Model):
     def insert_roles():
         roles = {
             'User': (Permission.CLASSIFY, False),
+            'User-Gamify': (Permission.CLASSIFY | 
+                Permission.GAMIFY, False),
             'Administrator': (0xff, False)
         }
         for r in roles:
@@ -181,15 +184,6 @@ class User(UserMixin, db.Model):
         return '{url}/{hash}?s={size}&d={default}&r={rating}'.format(
             url=url, hash=hash, size=size, default=default, rating=rating)
 
-    def to_json(self):
-        json_user = {
-            'url': url_for('api.get_user', id=self.id, _external=True),
-            'username': self.username,
-            'member_since': self.member_since,
-            'last_seen': self.last_seen
-        }
-        return json_user
-
     def generate_auth_token(self, expiration):
         s = Serializer(current_app.config['SECRET_KEY'],
                        expires_in=expiration)
@@ -235,42 +229,60 @@ class Classified(db.Model):
     @staticmethod
     def generate_fake(count=1000, user_count=1):
         from sqlalchemy.exc import IntegrityError
-        from random import seed, randint, choice, sample
+        from random import seed, randint, sample
+        from numpy.random import choice
         import forgery_py
         from datetime import datetime
         from sqlalchemy.sql.expression import func
 
         seed()
 
+        # Load all users into a list and sample n=user_count users
+
         user_query = User.query.all()
         u_ids = [i.id for i in user_query]
         u_ids = sample(u_ids, user_count)
 
+        # Load codes and project codes for application to surveys
+
         codes_query = Codes.query.filter(Codes.end_date == None).all()
         project_codes_query = ProjectCodes.query.filter(Codes.end_date == None).all()
 
+        # Convert to lists
+
         c_ids = [i.code_id for i in codes_query]
         pc_ids = [i.project_code_id for i in project_codes_query]
+        
+        # Cycle through each user and classify as a human would
 
-        for i in range(int(count/user_count)):
+        for j in range(user_count):
+            for i in range(int(count/user_count)):
+    
+                # Choose from surveys that have not already been classified as either
+                # PII, difficult, or already classified well.
 
-            raw_query = Priority.query.first()
-            r_id = raw_query.respondent_id
+                raw_query = Priority.query.filter(Priority.priority<6).first()
+                if raw_query:
+                    r_id = raw_query.respondent_id
 
-            r = Classified(
-                respondent_id = r_id,
-                coder_id = choice(u_ids),
-                code_id = choice(c_ids),
-                project_code_id = choice(pc_ids),
-                pii = choice(['Yes','No']),
-                date_coded='{:%Y-%m-%d %H:%M:%S.%f}'.format(datetime.now())
-                )
+                    r = Classified(
+                        respondent_id = r_id,
+                        coder_id = int(choice(u_ids)),
+                        code_id = int(choice(c_ids)),
+                        project_code_id = int(choice(pc_ids)),
+                        pii = choice(a=['Yes','No'], p=[0.001, 0.999]),
+                        date_coded='{:%Y-%m-%d %H:%M:%S.%f}'.format(datetime.now())
+                        )
+                else: 
+                    pass
+                    print('No surveys with the right priority remaining to be classified. Try running\
+                            Raw.generate_fake() to create more fake surveys before re-running Classified.generate_fake().')
 
-            db.session.add(r)
-            try:
-                db.session.commit()
-            except IntegrityError:
-                db.session.rollback()
+                db.session.add(r)
+                try:
+                    db.session.commit()
+                except IntegrityError:
+                    db.session.rollback()
 
     def __repr__(self):
         return '<respondent_id %s>' % self.respondent_id
@@ -550,3 +562,21 @@ class Urls(db.Model):
                 db.session.commit()
             except IntegrityError:
                 db.session.rollback()
+
+class Leaders(db.Model):
+    __tablename__ = 'leaders'
+    rank = db.Column(db.Integer(), primary_key=True)
+    username = db.Column(db.String(), index=True)
+    n = db.Column(db.Integer())
+
+class DailyLeaders(db.Model):
+    __tablename__ = 'daily_leaders'
+    rank = db.Column(db.Integer(), primary_key=True)
+    username = db.Column(db.String(), index=True)
+    n = db.Column(db.Integer())
+
+class WeeklyLeaders(db.Model):
+    __tablename__ = 'weekly_leaders'
+    rank = db.Column(db.Integer(), primary_key=True)
+    username = db.Column(db.String(), index=True)
+    n = db.Column(db.Integer())

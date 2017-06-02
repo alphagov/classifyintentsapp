@@ -1,10 +1,5 @@
 #!/usr/bin/env python
 import os
-COV = None
-if os.environ.get('FLASK_COVERAGE'):
-    import coverage
-    COV = coverage.coverage(branch=True, include='app/*')
-    COV.start()
 
 if os.path.exists('.env'):
     print('Importing environment from .env...')
@@ -46,9 +41,6 @@ manager.add_command('db', MigrateCommand)
 def test(coverage=False):
     """Run the unit tests."""
     import sys
-    if coverage and not os.environ.get('FLASK_COVERAGE'):
-        os.environ['FLASK_COVERAGE'] = '1'
-        os.execvp(sys.executable, [sys.executable] + sys.argv)
     import unittest
     tests = unittest.TestLoader().discover('tests')
     result = unittest.TextTestRunner(verbosity=2).run(tests)
@@ -76,14 +68,31 @@ def deploy():
 
     # create user roles
     Role.insert_roles()
-    Raw.generate_fake()
-    Codes.generate_fake()
-    ProjectCodes.generate_fake()
 
     # Create priority view
     query = query_loader('sql/views/priority.sql')
     db.session.execute(query)
-    db.session.commit()
+
+    # Create leaders view
+    query = query_loader('sql/views/leaders.sql')
+    db.session.execute(query)
+
+
+@manager.command
+def populate():
+    """Populate database with fake data."""
+    from flask_migrate import upgrade
+    from app.models import Role, User, Codes, ProjectCodes, Classified
+    # migrate database to latest revision
+ 
+    # create user roles
+
+    Raw.generate_fake(1000)
+    Codes.generate_fake()
+    ProjectCodes.generate_fake()
+    User.generate_fake(10)
+    
+    Classified.generate_fake(500,10)
 
 if __name__ == '__main__':
     manager.run()

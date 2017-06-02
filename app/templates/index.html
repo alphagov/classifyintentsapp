@@ -13,7 +13,7 @@
     <td colspan=2 class='survey_table_cell'>
     {% if survey.full_url %}
     <h4 class='code_table_header'>URL</h4>
-    <a class='survey_response' href='{{"https://gov.uk" + survey.full_url | safe}}' target='_blank'>{{ survey.full_url| safe }}</a>
+    <a class='survey_response' href='{{ "https://gov.uk" + survey.full_url }}' target='_blank'>{{ survey.full_url }}</a>
     {% endif %}
     </td>
     </tr>
@@ -21,13 +21,13 @@
     <td class='survey_table_cell'>
     {% if survey.cat_satisfaction %}
     <h4 class='code_table_header'>How satisfied were you with your visit today?</h4>
-    <p class='survey_response'>{{ survey.cat_satisfaction | safe }}</p>
+    <p class='survey_response'>{{ survey.cat_satisfaction }}</p>
     {% endif %}
     </td>
     <td class='survey_table_cell'>
     {% if survey.cat_found_looking_for %}
     <h4 class='code_table_header'>Did you find what you were looking for?</h4>
-    <p class='survey_response'>{{ survey.cat_found_looking_for | safe }}</p>
+    <p class='survey_response'>{{ survey.cat_found_looking_for }}</p>
     {% endif %}
     </td>
     </tr>
@@ -35,7 +35,7 @@
     <td colspan=2 class='survey_table_cell'>
     {% if survey.comment_why_you_came %}
     <h4 class='code_table_header'>Why did you come to GOV.UK today?</h4>
-    <p class='survey_response'>{{ survey.comment_why_you_came | safe }}</p>
+    <p class='survey_response'>{{ survey.comment_why_you_came }}</p>
     {% endif %}
     </td>
     </tr>
@@ -43,7 +43,7 @@
     <td colspan=2 class='survey_table_cell'>
     {% if survey.comment_where_for_help %}
     <h4 class='code_table_header'>Where else did you go for help?</h4>
-    <p class='survey_response'>{{ survey.comment_where_for_help | safe }}</p>
+    <p class='survey_response'>{{ survey.comment_where_for_help }}</p>
     {% endif %}
     </td>
     </tr>
@@ -51,7 +51,7 @@
     <td colspan=2 class='survey_table_cell'>
     {% if survey.comment_further_comments %}
     <h4 class='code_table_header'>Do you have any further comments?</h4>
-    <p class='survey_response'>{{ survey.comment_further_comments | safe }}</p>
+    <p class='survey_response'>{{ survey.comment_further_comments }}</p>
     {% endif %}
     <hr>
     </td>
