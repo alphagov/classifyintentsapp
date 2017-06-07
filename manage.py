@@ -64,7 +64,6 @@ def test(coverage=False):
         covdir = os.path.join(basedir, 'tmp/coverage')
         COV.html_report(directory=covdir)
         print('HTML version: file://%s/index.html' % covdir)
-        COV.erase()
 
 
 @manager.command
