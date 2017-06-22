@@ -36,6 +36,7 @@ pytz==2017.2
 requests==2.13.0
 requests-oauthlib==0.8.0
 Safe==0.4
+git+git://github.com/ukgovdatascience/scrubadub.git@v2.0.0
 selenium==3.4.1
 six==1.10.0
 SQLAlchemy==1.1.5
