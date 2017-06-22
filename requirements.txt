@@ -25,6 +25,7 @@ Jinja2==2.9.6
 Mako==1.0.6
 Markdown==2.6.8
 MarkupSafe==1.0
+numpy==1.12.1
 oauthlib==2.0.2
 packaging==16.8
 psycopg2==2.7.1
@@ -41,4 +42,3 @@ SQLAlchemy==1.1.5
 webencodings==0.5
 Werkzeug==0.12.1
 WTForms==2.1
-numpy==1.12.1

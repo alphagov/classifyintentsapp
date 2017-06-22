@@ -18,13 +18,14 @@ class PasswordStrength(object):
     '''
     def __init__(self, message=None):
         if not message:
-            message = 'Your password is too weak. Please try again with a more secure password.'
+            message = 'Your password is too easy to guess. Please try again ' \
+                   'with a harder to guess password.'
         self.message = message
 
     def __call__(self, form, field):
         p = field.data
         strength = safe.check(p)
-        if strength.strength not in ['medium','strong']:
+        if strength.strength not in ['medium', 'strong']:
             raise ValidationError(self.message)
 
 class RegistrationForm(FlaskForm):
@@ -47,7 +48,7 @@ class RegistrationForm(FlaskForm):
     password = PasswordField('Password', validators=[
         DataRequired(), 
         EqualTo('password2', message='Passwords must match.'),
-        Length(8,64, message='Password must be at least 8 characters in length.'),
+        Length(min=8, message='Password must be at least 8 characters in length.'),
         PasswordStrength()
         ])
     password2 = PasswordField('Confirm password', validators=[DataRequired()])
@@ -65,7 +66,11 @@ class RegistrationForm(FlaskForm):
 class ChangePasswordForm(FlaskForm):
     old_password = PasswordField('Old password', validators=[DataRequired()])
     password = PasswordField('New password', validators=[
-        DataRequired(), EqualTo('password2', message='Passwords must match')])
+        DataRequired(), 
+        EqualTo('password2', message='Passwords must match.'),
+        Length(min=8, message='Password must be at least 8 characters in length.'),
+        PasswordStrength()
+        ])
     password2 = PasswordField('Confirm new password', validators=[DataRequired()])
     submit = SubmitField('Update Password')
 
