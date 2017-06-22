@@ -18,8 +18,8 @@ class PasswordStrength(object):
     '''
     def __init__(self, message=None):
         if not message:
-            message = 'Your password is too easy to guess. Please try again\
-                    with a harder to guess password.'
+            message = 'Your password is too easy to guess. Please try again ' \
+                   'with a harder to guess password.'
         self.message = message
 
     def __call__(self, form, field):
