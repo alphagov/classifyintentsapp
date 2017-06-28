@@ -64,8 +64,7 @@ Alternatively set the `FLASKY_ADMIN` environment variable to your email address,
 
 * Set up a heroku pipeline to detect pushes on master to github
 * Push to github, heroku will detect, and build the app
-* Run `heroku run python manage.py deploy` to run deployment tasks on the server.
-* You will probably need to drop the priority table that is created from a psql console with `drop table priority;` then `\i sql/views/priority.sql` to create a priority view in its place.
+* Run `python manage.py deploy` on a local deployment (or `heroku run python manage.py deploy` on a heroku deployment) to run deployment tasks on the server.
 
 Following changes to the database migrations can be made with:
 
@@ -77,7 +76,7 @@ python manage.py db upgrade
 ### Generating dummy data
 
 To generate fake data run `python manage.py populate` this will run a series of methods on the models which are defined in app/models.
-These methods can be run independent of `python manage.py populate` by opening an an app specific shell with `python manage.py shell`, and executing the commands:
+These methods can be run independent of `python manage.py populate` by opening an app specific shell with `python manage.py shell`, and executing the commands:
 
 ```
 Raw.generate_fake()
@@ -102,7 +101,7 @@ db.session.execute(query)
 db.session.commit()
 ```
 
-Note that `Raw.generate_fake()` will use real GOV.UK urls from the govukurls.txt file.
+Note that `Raw.generate_fake()` will use real GOV.UK urls from the govukurls.txt.
 These entries are created by the `Raw.get_urls()` method which queries the [gov.uk/random](https://gov.uk/random) page.
 Results are stored in the govukurls.txt file and can be appended to by running the `Raw.get_urls()` method taking the number of new pages to add as the first argument.
 Note that this process can be quite slow as a 5 second gap is required between each query, in order to return a unique URL.
