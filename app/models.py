@@ -497,12 +497,12 @@ class Priority(db.Model):
     max = db.Column(db.BigInteger())
     ratio = db.Column(db.Numeric())
     total = db.Column(db.Integer())
+    vote = db.Column(db.Integer())
     coders = db.Column(db.ARRAY(db.Integer()))
     priority = db.Column(db.Integer())
 
     def __repr__(self):
-        return '<respondent_id %s date %s priority %s>' % (self.respondent_id, self.month, self.priority)
-
+        return '<respondent_id %s date %s priority %s vote %s>' % (self.respondent_id, self.month, self.priority, self.vote)
 
 class Urls(db.Model):
     __tablename__ = 'urls'

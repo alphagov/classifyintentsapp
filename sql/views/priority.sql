@@ -39,9 +39,23 @@ total_codes on
 ),
 -- Get the maximum ratio and total, aggregating up to the survey level
 survey_level_ratio as (
-select respondent_id, max(code_id) as coded, max(max) as max, max(ratio) as ratio, max(total) as total 
+select a.respondent_id, 
+    a.ratio, 
+    a.code_id, 
+    cast(a.total as integer) total,
+    a.max,
+    case when a.total > 2 and a.ratio > 0.5 then a.code_id
+         when a.total = 1 then a.code_id 
+         else NULL
+    end as vote
+from ratio_table a
+inner join (
+select respondent_id, 
+    max(ratio) ratio
 from ratio_table
 group by respondent_id
+) b
+on (a.respondent_id = b.respondent_id and a.ratio = b.ratio)
 ),
 -- Identify which surveys were already classified automatically.
 -- This will generally be surveys which do not have any free text
@@ -71,6 +85,7 @@ final_priority as (
 select  slr.respondent_id, 
         date_trunc('month', raw.start_date) as month,
         slr.max,
+        slr.vote,
         slr.ratio,
         slr.total,
         wcw.coders,
@@ -87,9 +102,9 @@ select  slr.respondent_id,
             -- When there is not a majority and five or fewer codes applied (still undecided)
             when slr.ratio <= 0.5 and slr.total <= 4 then 1
             -- When the survey has not been coded before (new survey)
-            when slr.total = 1 and slr.ratio = 1 and slr.coded is null then 2
+            when slr.total = 1 and slr.ratio = 1 and slr.vote is null then 2
             -- When the survey has been coded just once (still undecided)
-            when slr.total = 1 and slr.ratio = 1 and slr.coded is not null then 1
+            when slr.total = 1 and slr.ratio = 1 then 1
             -- When the survey has been classified 5 times, with no decision (difficult to code)
             when slr.total > 4 and slr.ratio < 0.5 then 7
             else 9
