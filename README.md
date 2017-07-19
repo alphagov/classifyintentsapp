@@ -131,6 +131,9 @@ Surveys with priority >=6 are removed from circulation (in the case of 7 and 8: 
 
 Within the priority codes, surveys are ordered by descending date order, so that the most recent survey will always come up first.
 
+Note that respondent_id is not unique in the priority view.
+Under circumstances where there is no discernible majority, i.e. there are two or more botes with a majority < 0.5, both these entries will appear in the priority view.
+
 ### Is it tested?
 
 Yout bet. Tests are in the tests/ folder. Either run `python manage.py test` to execute all, (required for database setup and teardown), or you can run individual tests with `python -m unittest tests/test_lookup.py` (for example).
