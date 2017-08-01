@@ -293,10 +293,6 @@ class Raw(db.Model):
     collector_id = db.Column(db.String())
     start_date = db.Column(db.DateTime(), index=True)
     end_date = db.Column(db.DateTime(), index=True)
-    ip_address = db.Column(db.String())
-    email_address = db.Column(db.String())
-    first_name = db.Column(db.String())
-    last_name = db.Column(db.String())
     full_url = db.Column(db.String())
     cat_work_or_personal =  db.Column(db.String(20))
     comment_what_work = db.Column(db.String())
@@ -497,28 +493,31 @@ class Priority(db.Model):
     max = db.Column(db.BigInteger())
     ratio = db.Column(db.Numeric())
     total = db.Column(db.Integer())
+    vote = db.Column(db.Integer())
     coders = db.Column(db.ARRAY(db.Integer()))
     priority = db.Column(db.Integer())
 
     def __repr__(self):
-        return '<respondent_id %s date %s priority %s>' % (self.respondent_id, self.month, self.priority)
-
+        return '<respondent_id %s date %s priority %s vote %s>' % (self.respondent_id, self.month, self.priority, self.vote)
 
 class Urls(db.Model):
     __tablename__ = 'urls'
     url_id = db.Column(db.Integer(), primary_key=True, index=True)
     full_url = db.Column(db.String(), index=True)
     page = db.Column(db.String(), index=True)
-    section0 = db.Column(db.String(), index=True)
-    section1 = db.Column(db.String(), index=True)
-    section2 = db.Column(db.String(), index=True)
-    section3 = db.Column(db.String(), index=True)
     org0 = db.Column(db.String(), index=True)
     org1 = db.Column(db.String(), index=True)
     org2 = db.Column(db.String(), index=True)
     org3 = db.Column(db.String(), index=True)
-    org4 = db.Column(db.String(), index=True)
+    section0 = db.Column(db.String(), index=True)
+    section1 = db.Column(db.String(), index=True)
+    section2 = db.Column(db.String(), index=True)
+    section3 = db.Column(db.String(), index=True)
+    section4 = db.Column(db.String(), index=True)
+    section5 = db.Column(db.String(), index=True)
+    section6 = db.Column(db.String(), index=True)
     lookup_date = db.Column(db.DateTime(), index=True)
+    status = db.Column(db.Integer(), index=True)
 
     def __repr__(self):
         return '<full_url %s org %s section %s date %s >' % (self.full_url, self.org0, self.section0, self.lookup_date)
