@@ -49,6 +49,9 @@ class Role(db.Model):
 
 
 class User(UserMixin, db.Model):
+    '''A user of this classification webapp (as opposed to a person who filled
+    in the survey, who is a 'respondent')
+    '''
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(64), unique=True, index=True)
@@ -217,11 +220,13 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 class Classified(db.Model):
+    '''A user's classification/coding of a survey'''
     __tablename__ = 'classified'
     classified_id = db.Column(db.Integer(), primary_key=True, index=True)
     respondent_id = db.Column(db.BigInteger(), db.ForeignKey('raw.respondent_id'), index=True)
     coder_id = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=False, index=True)
     code_id = db.Column(db.Integer(), db.ForeignKey('codes.code_id'), nullable=False, index=True)
+    # see also the backref from Raw
     project_code_id = db.Column(db.Integer(), db.ForeignKey('project_codes.project_code_id'), index=True)
     pii = db.Column(db.Boolean(), index=True)
     date_coded = db.Column(db.DateTime(), nullable=False)
@@ -288,6 +293,11 @@ class Classified(db.Model):
         return '<respondent_id %s>' % self.respondent_id
 
 class Raw(db.Model):
+    '''Represents a survey (i.e. the thing that gets classified).
+
+    The data is inserted raw from the survey software, so that determines the
+    structure.
+    '''
     __tablename__ = 'raw'
     respondent_id = db.Column(db.BigInteger(), primary_key=True, index=True)
     collector_id = db.Column(db.String())
@@ -298,7 +308,7 @@ class Raw(db.Model):
     first_name = db.Column(db.String())
     last_name = db.Column(db.String())
     full_url = db.Column(db.String())
-    cat_work_or_personal =  db.Column(db.String(20))
+    cat_work_or_personal =  db.Column(db.String(20))  # category - work or personal
     comment_what_work = db.Column(db.String())
     comment_why_you_came = db.Column(db.String())
     cat_found_looking_for = db.Column(db.String(20))
@@ -390,6 +400,9 @@ class Raw(db.Model):
         return '<respondent_id %s>' % self.respondent_id
 
 class Codes(db.Model):
+    '''A classification of the survey comment meaning
+    e.g. 'complaint' or 'wanting to contact government'
+    '''
     __tablename__ = 'codes'
     code_id = db.Column(db.Integer(), primary_key=True, index=True)
     code = db.Column(db.String(50))
@@ -441,6 +454,10 @@ class Codes(db.Model):
 
 
 class ProjectCodes(db.Model):
+    '''A classification of the survey comments relationship with a government
+    service/project
+    e.g. 'GOV.UK Notify'
+    '''
     __tablename__ = 'project_codes'
     project_code_id = db.Column(db.Integer(), primary_key=True, index=True)
     project_code = db.Column(db.String(50))
@@ -491,6 +508,12 @@ class ProjectCodes(db.Model):
                 db.session.rollback()
 
 class Priority(db.Model):
+    '''A calculated 'priority' for each survey, which determines the order that
+    users are asked to classify surveys.
+
+    Implemented as a database view.
+    '''
+
     __tablename__ = 'priority'
     respondent_id = db.Column(db.BigInteger(), primary_key=True)
     month = db.Column(db.DateTime())
@@ -505,6 +528,9 @@ class Priority(db.Model):
 
 
 class Urls(db.Model):
+    '''A page on GOV.UK, which is the context for each survey that is filled
+    in.
+    '''
     __tablename__ = 'urls'
     url_id = db.Column(db.Integer(), primary_key=True, index=True)
     full_url = db.Column(db.String(), index=True)

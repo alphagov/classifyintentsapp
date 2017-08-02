@@ -133,11 +133,11 @@ Within the priority codes, surveys are ordered by descending date order, so that
 
 ### Is it tested?
 
-Yout bet. Tests are in the tests/ folder. Either run `python manage.py test` to execute all, (required for database setup and teardown), or you can run individual tests with `python -m unittest tests/test_lookup.py` (for example).
+You bet. Tests are in the tests/ folder. Either run `python manage.py test` to execute all, (required for database setup and teardown), or you can run individual tests with `python -m unittest tests/test_lookup.py` (for example).
 
 Tests must be run on a postgres data base, so the `TEST_DATABASE_URL` environmental variable must be set in `.env`.
 
-To complete tests using selenium, you will need to download the [chromedriver](https://chromedriver.storage.googleapis.com) and load it into your path, otherwise these tesst will pass without failing.
+To complete tests using selenium, you will need to download the [chromedriver](https://chromedriver.storage.googleapis.com) and load it into your path, otherwise these tests will pass without failing.
 
 ### Common Problems
 
