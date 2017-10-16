@@ -105,7 +105,7 @@ def populate():
     # migrate database to latest revision
  
     # create user roles
-
+    Role.insert_roles()
     Raw.generate_fake(1000)
     Codes.generate_fake()
     ProjectCodes.generate_fake()
