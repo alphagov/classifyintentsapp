@@ -76,13 +76,19 @@ def profile(length=25, profile_dir=None):
 
 
 @manager.command
+def deploy_local():
+    deploy()
+    populate()
+
+
+@manager.command
 def deploy():
     """Run deployment tasks."""
     from flask_migrate import upgrade
     from app.models import Role, User
     from app.queryloader import query_loader
     # migrate database to latest revision
- 
+
     upgrade()
 
     # create user roles
@@ -103,15 +109,14 @@ def populate():
     from flask_migrate import upgrade
     from app.models import Role, User, Codes, ProjectCodes, Classified
     # migrate database to latest revision
- 
+
     # create user roles
-    Role.insert_roles()
     Raw.generate_fake(1000)
     Codes.generate_fake()
     ProjectCodes.generate_fake()
     User.generate_fake(10)
-    
-    Classified.generate_fake(500,10)
+
+    Classified.generate_fake(500, 10)
 
 if __name__ == '__main__':
     manager.run()
