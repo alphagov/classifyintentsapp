@@ -44,27 +44,45 @@ Note that you will need to set a postgres URI for the DEV and TEST database even
 
 The dev database is setup/migrated using:
 
-    python manage.py deploy
+```
+python manage.py deploy_local
+```
 
-To create a user, open a shell:
+This will run the following deployment tasks:
 
-    python manage.py shell
+* Create all the database tables.
+* Execute sql scripts to create database views.
+* Populate the database with fake data.
+
+Ensure that you have specified your email address in the `FLASKY_ADMIN` environment variable, and then register with the application using the registration page.
+
+```
+python manage.py runserver
+```
+
+You will automatically be granted administrator rights to the web application.
+
+If you are running the server without first setting up a mail account for handling user registrations, you will need to create a user manually. Open a shell:
+
+```
+python manage.py shell
+```
 
 Then:
 
-    from app.models import User, Role
-    admin_id = Role.query.filter(Role.name=='Administrator').with_entities(Role.id).scalar()
-    u = User(username='admin', email='admin@admin.com', password='pass', role=Role.query.get(admin_id), confirmed=True)
-    db.session.add(u)
-    db.session.commit()
+```
+from app.models import User, Role
+admin_id = Role.query.filter(Role.name=='Administrator').with_entities(Role.id).scalar()
+u = User(username='admin', email='admin@admin.com', password='pass', role=Role.query.get(admin_id), confirmed=True)
+db.session.add(u)
+db.session.commit()
+```
 
-Alternatively set the `FLASKY_ADMIN` environment variable to your email address, and then register with the application using the gregistration page. This will automatically grant you the administrator role.
-
-### Setting up the app on Heroku
+### Setting up the app on Heroku/other PaaS
 
 * Set up a heroku pipeline to detect pushes on master to github
 * Push to github, heroku will detect, and build the app
-* Run `python manage.py deploy` on a local deployment (or `heroku run python manage.py deploy` on a heroku deployment) to run deployment tasks on the server.
+* Run `heroku run python manage.py deploy` to run deployment tasks on the server.
 
 Following changes to the database migrations can be made with:
 
@@ -75,14 +93,13 @@ python manage.py db upgrade
 
 ### Generating dummy data
 
-To generate fake data run `python manage.py populate` this will run a series of methods on the models which are defined in app/models.
-These methods can be run independent of `python manage.py populate` by opening an app specific shell with `python manage.py shell`, and executing the commands:
+Dummy data is generated as part of the `python manage.py deploy_local` command, but these methods can be run independent of `python manage.py deploy_local` by runnign `python manage.py populate`, or by opening an app specific shell with `python manage.py shell`, and executing the commands:
 
 ```
+Role.insert_roles()
 Raw.generate_fake()
 Codes.generate_fake()
 ProjectCodes.generate_fake()
-Role.insert_roles()
 User.generate_fake()
 Classified.generate_fake()
 ```
@@ -90,7 +107,11 @@ Classified.generate_fake()
 Each method accepts as its first argument the number of records to create. `Classified.generate_fake()` also accepts a second method which specifies the number or random users over which the specified number of Classified records will be spread.
 Note that it is possible to 'run out' of eligible surveys to classify using this method, in which case more fake surveys should be generated with `Raw.generate_fake()`.
 
-Note that the views: priority, leaders, daily_leaders, and weekly_leaders are not created in the migration script, but instead by running the queries contained in sql/views/priority.sql and sql/views/leaders.sql.
+### Gotchas
+
+#### Manually creating views
+
+Note that the views: priority, leaders, daily_leaders, and weekly_leaders are not created in the migration script, but instead by running the queries contained in sql/views/priority.sql and sql/views/leaders.sql. This is automatically handled in the `python manage.py deploy` and `python manage.py deploy_local` commands.
 This may cause confusion if you create tables using `db.create_all()` from the shell instead of using `python manage.py deploy` (which is the best approach).
 From the `python manage.py shell` these queries can be executed with:
 
@@ -109,8 +130,10 @@ Note that this process can be quite slow as a 5 second gap is required between e
 ### Running a local server
 
 ```
-./manage.py runserver
+python manage.py runserver
 ```
+
+The local server will be available at <https://127.0.0.1:5000>.
 
 ### How new surveys are selected (the priority view)
 
