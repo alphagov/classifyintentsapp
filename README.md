@@ -107,6 +107,31 @@ Classified.generate_fake()
 Each method accepts as its first argument the number of records to create. `Classified.generate_fake()` also accepts a second method which specifies the number or random users over which the specified number of Classified records will be spread.
 Note that it is possible to 'run out' of eligible surveys to classify using this method, in which case more fake surveys should be generated with `Raw.generate_fake()`.
 
+### Connecting to the database on GOV.UK PaaS
+
+When hosting databases on GOV.UK PaaS, it is not possible to make a direct connection between your local machine and the remote server. This must be handled using an SSH tunnel. More information is available in the [GOV.UK PaaS documentation](https://docs.cloud.service.gov.uk/#creating-tcp-tunnels-with-ssh).
+
+To see the details of the postgres database run:
+
+```
+cf env APP_NAME 
+```
+which will return a json containing the server configuration.
+
+To create an SSH tunnel via the instance running the web application run:
+
+```
+cf ssh classifyapp -L 6666:HOST:PORT
+```
+
+In a new terminal window then run: 
+
+```
+psql postgres://USERNAME:PASSWORD@localhost:6666/DATABASE_NAME
+```
+
+substituting the database details.
+
 ### Gotchas
 
 #### Manually creating views
@@ -168,3 +193,4 @@ To complete tests using selenium, you will need to download the [chromedriver](h
 ### Common Problems
 
 The following error `AttributeError: 'NoneType' object has no attribute 'drivername'` indicates that the `DEV_DATABASE_URL` environmental variable has not been set.
+
