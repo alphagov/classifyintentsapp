@@ -95,8 +95,16 @@ class PasswordResetForm(FlaskForm):
 
 
 class ChangeEmailForm(FlaskForm):
-    email = StringField('New Email', validators=[DataRequired(), Length(1, 64),
-                                                 Email()])
+    email = StringField(
+        'Email address',
+        validators=[
+            DataRequired(),
+            Length(1, 64),
+            Email(),
+            Regexp(regex = '.*\@digital\.cabinet\-office\.gov\.uk', message='Must be a valid @digital.cabinet-office.gov.uk address')
+            
+            ]
+        )
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Update Email Address')
 
