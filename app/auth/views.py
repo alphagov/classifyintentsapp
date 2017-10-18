@@ -57,8 +57,9 @@ def register():
         db.session.add(user)
         db.session.commit()
         token = user.generate_confirmation_token()
-        send_email(user.email, 'Confirm Your Account',
-                   'auth/email/confirm', user=user, token=token)
+        url = url_for('auth.confirm', token=token, _external=True)
+        send_email(to=user.email, subject='Confirm Your Account',
+                   body=url, name=user.username, template='confirm')
         flash('A confirmation email has been sent to you by email.')
         return redirect(url_for('auth.login'))
     return render_template('auth/register.html', form=form)
@@ -80,8 +81,9 @@ def confirm(token):
 @login_required
 def resend_confirmation():
     token = current_user.generate_confirmation_token()
-    send_email(current_user.email, 'Confirm Your Account',
-               'auth/email/confirm', user=current_user, token=token)
+    url = url_for('auth.confirm', token=token, _external=True)
+    send_email(to=current_user.email, subject='Confirm Your Account',
+                   body=url, name=current_user.username, template='confirm')
     flash('A new confirmation email has been sent to you by email.')
     return redirect(url_for('main.index'))
 
@@ -110,10 +112,9 @@ def password_reset_request():
         user = User.query.filter_by(email=form.email.data).first()
         if user:
             token = user.generate_reset_token()
-            send_email(user.email, 'Reset Your Password',
-                       'auth/email/reset_password',
-                       user=user, token=token,
-                       next=request.args.get('next'))
+            url = url_for('auth.password_reset', token=token, _external=True)
+            send_email(to=user.email, subject='Reset Your Password',
+                      body=url, name=user.username, template='password_reset')
         flash('An email with instructions to reset your password has been '
               'sent to you.')
         return redirect(url_for('auth.login'))
@@ -145,9 +146,9 @@ def change_email_request():
         if current_user.verify_password(form.password.data):
             new_email = form.email.data
             token = current_user.generate_email_change_token(new_email)
-            send_email(new_email, 'Confirm your email address',
-                       'auth/email/change_email',
-                       user=current_user, token=token)
+            url = url_for('auth.password_reset', token=token, _external=True)
+            send_email(to=new_email, subject='Change Your Email',
+                      body=url, name=current_user.email, template='change_email')
             flash('An email with instructions to confirm your new email '
                   'address has been sent to you.')
             return redirect(url_for('main.index'))
