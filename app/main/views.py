@@ -1,14 +1,19 @@
-from flask import render_template, redirect, url_for, abort, flash, request, current_app, make_response
+from flask import (
+    render_template, redirect, url_for, abort, flash, request, current_app,
+    make_response)
 from flask_login import login_required, current_user
 from flask_sqlalchemy import get_debug_queries
 from . import main
 from .forms import EditProfileForm, EditProfileAdminForm, ClassifyForm
 from .. import db
-from ..models import Permission, Role, User, Classified, Raw, Codes, ProjectCodes, Priority, Leaders, DailyLeaders, WeeklyLeaders
+from ..models import (
+    Permission, Role, User, Classified, Raw, Codes, ProjectCodes, Priority,
+    Leaders, DailyLeaders, WeeklyLeaders)
 from ..decorators import admin_required, permission_required
 from datetime import datetime, date
 from functools import wraps
 from random import choice
+
 
 @main.after_app_request
 def after_request(response):
@@ -34,19 +39,20 @@ def server_shutdown():
 
 def new_survey(user, model):
     '''
-    Select the next survey: ensures that a coder doesn't see the same 
+    Select the next survey: ensures that a coder doesn't see the same
     survey more than once.
-    
+
     '''
 
     # This query can be slow.
-    # Filter by 6 will remove all automated and recalcitrant surveys, pii, 
+    # Filter by 6 will remove all automated and recalcitrant surveys, pii,
     # And those already happily classified.
 
-    priority = model.query.filter(Priority.priority<6).all()
+    priority = model.query.filter(Priority.priority < 6).all()
 
-    priority_list = [i for i in priority if i.coders is None or user not in i.coders]
-    
+    priority_list = [
+        i for i in priority if i.coders is None or user not in i.coders]
+
     # Set a limit on how many failures to accept
 
     count = 0
@@ -55,10 +61,11 @@ def new_survey(user, model):
 
         count += 1
 
-        priority = model.query.filter(Priority.priority<6).all()
+        priority = model.query.filter(Priority.priority < 6).all()
 
-        priority_list = [i for i in priority if i.coders is None or user not in i.coders]
-    
+        priority_list = [
+            i for i in priority if i.coders is None or user not in i.coders]
+
     return(priority_list)
 
 # Main classification page
@@ -73,40 +80,44 @@ def index():
     # is found that the user has not yet seen.
 
     priority = new_survey(current_user.id, Priority)    
-    
+
     # Check that there are some entries returned if not
     # Redirect to 'All done page'
 
     if len(priority) == 0:
-        
+
         flash('You\'re all caught up. Check back later for new surveys.')
 
         return render_template('404.html')
 
     else:
         priority = priority[0]
-    
-        survey = Raw.query.filter(Raw.respondent_id==priority.respondent_id).first()
+
+        survey = Raw.query.filter(
+            Raw.respondent_id==priority.respondent_id).first()
         survey_id = survey.respondent_id
 
         # Create forms for entering code and project_code
 
         codes_form = ClassifyForm.codes()
 
-
         if codes_form.validate_on_submit():
             flash('Survey %s classified' % survey_id)
 
             # Get number of surveys coded today, and print number on every ten
 
-            coded_today = Classified.query.filter(Classified.coder_id == current_user.id).filter(Classified.date_coded > date.today()).count() + 1
-        
-            if coded_today%10 == 0:
-            
-                exclaim = ['Well Done!', 'Great!', 'Congratulations!', 'Great Work!', 
-                        'Boom!', 'Amazeballs!', 'Amazing!']
+            coded_today = Classified.query.filter(
+                Classified.coder_id == current_user.id).filter(
+                    Classified.date_coded > date.today()).count() + 1
 
-                flash('%s You have coded %d surveys today!' % (choice(exclaim), coded_today))
+            if coded_today % 10 == 0:
+
+                exclaim = [
+                    'Well Done!', 'Great!', 'Congratulations!', 'Great Work!',
+                    'Boom!', 'Amazeballs!', 'Amazing!']
+
+                flash('%s You have coded %d surveys today!' % (
+                    choice(exclaim), coded_today))
 
             # Save data into the Classified table
 
@@ -181,12 +192,14 @@ def edit_profile_admin(id):
     form.about_me.data = user.about_me
     return render_template('edit_profile.html', form=form, user=user)
 
+
 @main.route('/codes', methods=['GET'])
 @login_required
 def code_table():
     codes = Codes.query.filter(Codes.end_date == None).all()
     table = [i.__dict__ for i in codes]
     return render_template('codes.html', table=table)
+
 
 @main.route('/users', methods=['GET'])
 @login_required
@@ -196,18 +209,20 @@ def auth_table():
     table = [i.__dict__ for i in users]
     return render_template('users.html', table=table)
 
+
 @main.route('/leaders', methods=['GET'])
 @login_required
 @permission_required(Permission.GAMIFY)
 def leader_table():
     all_time_leaders = Leaders.query.all()
     all_table = [i.__dict__ for i in all_time_leaders]
-    
+
     daily_leaders = DailyLeaders.query.all()
     daily_table = [i.__dict__ for i in daily_leaders]
-    
+
     weekly_leaders = WeeklyLeaders.query.all()
     weekly_table = [i.__dict__ for i in weekly_leaders]
-    
-    return render_template('leaders.html', all_table=all_table,
-            weekly_table=weekly_table, daily_table=daily_table)
+
+    return render_template(
+        'leaders.html', all_table=all_table, weekly_table=weekly_table,
+        daily_table=daily_table)

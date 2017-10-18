@@ -6,14 +6,15 @@ db.session.execute()
 import os
 from re import match
 
+
 def query_loader(path):
 
     # Normalise the path
 
     path = os.path.abspath(path)
-        
-    #open the .sql file
-    sql_file = open(path,'r')
+
+    # open the .sql file
+    sql_file = open(path, 'r')
 
     # Create an empty command string
     sql_command = ''
