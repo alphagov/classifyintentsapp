@@ -4,65 +4,85 @@
 # Classify intents survey web app
 
 This repository contains a Flask app designed to improve the process of classifying surveys received in the GOV.UK intents survey.
+The application is hosted on [GOV.UK PaaS](https://www.cloud.service.gov.uk/).
 
-The app is hosted at [https://classifyintents.herokuapp.com](https://classifyintents.herokuapp.com)
-
-
-A blog about the survey is available on [gov.uk](https://gdsdata.blog.gov.uk/2016/12/20/using-machine-learning-to-classify-user-comments-on-gov-uk/), whilst the code is available as a [python package](https://github.com/ukgovdatascience/classifyintents) and [supporting scripts](https://github.com/ukgovdatascience/classifyintentspipe).
+A blog about the GOV.UK intent survey is available on [gov.uk](https://gdsdata.blog.gov.uk/2016/12/20/using-machine-learning-to-classify-user-comments-on-gov-uk/), whilst the code is available as a [python package](https://github.com/ukgovdatascience/classifyintents) and [supporting scripts](https://github.com/ukgovdatascience/classifyintentspipe).
 
 The underlying framework of the app is based heavily on the micro blogging site by [Miguel Grinberg](https://github.com/miguelgrinberg/flasky) which features in the O'Reilly book [Flask Web Development](http://www.flaskbook.com).
 
 ## Getting started
 
-### Environment variables
+### Deploying the app onto PaaS
 
-It is adviseable to use [autoenv](https://github.com/kennethreitz/autoenv) to manage environmental variables.
-
-Install with: `pip install autoenv`, and then set all environmental variables in a `.env` files.
-
-The following variables should be set in `.env`:
-
-* __MAIL_USERNAME__: Email username used for sending confirmations when signing up.
-* __MAIL_PASSWORD__: Password for above email account (probably a gmail account)
-* __DEV_DATABASE_URL__: URL of the database used for development
-* __TEST_DATABASE_URL__: URL of test database.
-* __DATABASE_URL__: URL of production database.
-* __SECRET_KEY__: Key for Cross Site Forgery Protection.
-* __FLASKY_ADMIN__: Email address for administrator account.
-
-Note that `DATABASE_URL` is subject to change if deployed on heroku, and for this reason should be set dynamically following 12 factor app principles with:
+To deploy manually on PaaS, navigate to the root of the project and run. Note that the .cfignore file mirrors the .gitignore file, so any files you wish to exclude from being pushed onto the PaaS instance should be added to the 
 
 ```
-DATABASE_URL=$(heroku config:get DATABASE_URL -a classifyintents)
+cf push
 ```
 
-See [heroku docs](https://devcenter.heroku.com/articles/connecting-to-heroku-postgres-databases-from-outside-of-heroku) for more details.
-
-Note that you will need to set a postgres URI for the DEV and TEST database even if you don't intent to use them, otherwise this can cause errors during set up.
-
-### Setting up the app to run locally
-
-The dev database is setup/migrated using:
+Environment variables for the instance should be set in manifest.yml.
+This file should be in the following format:
 
 ```
-python manage.py deploy_local
+---
+applications:
+- name: classifyapp
+  env:
+    DATABASE_URL: postgres://username:password@host:port/database
+    DEV_DATABASE_URL: postgres://username:password@host:port/database
+    TEST_DATABASE_URL: postgres://username:password@host:port/database
+    FLASKY_ADMIN: username@domain.com 
+    SECRET_KEY: key-to-prevent_csrf
+    FLASK_CONFIG: production
+    NOTIFY_API_KEY: govuk-notify-api-key
+---
+
 ```
 
-This will run the following deployment tasks:
+If you are running a server locally, these environment variables should be set in a `.env` file (and ideally managed using [autoenv](https://github.com/kennethreitz/autoenv) or similar). You will probably want to set the `FLASK_CONFIG` variable to `development`.
 
-* Create all the database tables.
-* Execute sql scripts to create database views.
-* Populate the database with fake data.
+#### Setting up the database
 
-Ensure that you have specified your email address in the `FLASKY_ADMIN` environment variable, and then register with the application using the registration page.
+When deploying the application for the first time you must log into the instance running the application and deploy the application manually.
+To access the server run:
+
+```
+cf ssh classifyapp
+```
+
+You will then need to activate the local environment:
+
+```
+export DEPS_DIR=/home/vcap/deps
+for f in /home/vcap/app/.profile.d/*.sh; do source $f; done
+```
+then:
+
+```
+cd app/ # navigate to the project root
+python manage.py upgrade
+```
+
+If you wish to populate the database with dummy data, you can also run:
+
+```
+python manage.py deploy
+```
+
+See below for more details on generating dummy data.
+A local server can then be deployed with:
 
 ```
 python manage.py runserver
 ```
 
-You will automatically be granted administrator rights to the web application.
+and accessed at `https://127.0.0.1:5000`.
 
-If you are running the server without first setting up a mail account for handling user registrations, you will need to create a user manually. Open a shell:
+#### Getting admin access to the application
+
+Ensure that you have specified your email address in the `FLASKY_ADMIN` environment variable, and then register with the application using the registration page.
+You will automatically be granted administrator rights to the web application.
+If you are running the server without access to notify, you will need to create a user manually. Open a shell:
 
 ```
 python manage.py shell
@@ -76,19 +96,6 @@ admin_id = Role.query.filter(Role.name=='Administrator').with_entities(Role.id).
 u = User(username='admin', email='admin@admin.com', password='pass', role=Role.query.get(admin_id), confirmed=True)
 db.session.add(u)
 db.session.commit()
-```
-
-### Setting up the app on Heroku/other PaaS
-
-* Set up a heroku pipeline to detect pushes on master to github
-* Push to github, heroku will detect, and build the app
-* Run `heroku run python manage.py deploy` to run deployment tasks on the server.
-
-Following changes to the database migrations can be made with:
-
-```
-python manage.py db migrate
-python manage.py db upgrade
 ```
 
 ### Generating dummy data
@@ -132,34 +139,6 @@ psql postgres://USERNAME:PASSWORD@localhost:6666/DATABASE_NAME
 
 substituting the database details.
 
-### Gotchas
-
-#### Manually creating views
-
-Note that the views: priority, leaders, daily_leaders, and weekly_leaders are not created in the migration script, but instead by running the queries contained in sql/views/priority.sql and sql/views/leaders.sql. This is automatically handled in the `python manage.py deploy` and `python manage.py deploy_local` commands.
-This may cause confusion if you create tables using `db.create_all()` from the shell instead of using `python manage.py deploy` (which is the best approach).
-From the `python manage.py shell` these queries can be executed with:
-
-```
-from app.queryloader import *
-query = query_loader('sql/views/priority.sql')
-db.session.execute(query)
-db.session.commit()
-```
-
-Note that `Raw.generate_fake()` will use real GOV.UK urls from the govukurls.txt.
-These entries are created by the `Raw.get_urls()` method which queries the [gov.uk/random](https://gov.uk/random) page.
-Results are stored in the govukurls.txt file and can be appended to by running the `Raw.get_urls()` method taking the number of new pages to add as the first argument.
-Note that this process can be quite slow as a 5 second gap is required between each query, in order to return a unique URL.
-
-### Running a local server
-
-```
-python manage.py runserver
-```
-
-The local server will be available at <https://127.0.0.1:5000>.
-
 ### How new surveys are selected (the priority view)
 
 How surveys should be prioritised to users is controlled by the prioritisation view.
@@ -190,7 +169,29 @@ Tests must be run on a postgres data base, so the `TEST_DATABASE_URL` environmen
 
 To complete tests using selenium, you will need to download the [chromedriver](https://chromedriver.storage.googleapis.com) and load it into your path, otherwise these tests will pass without failing.
 
-### Common Problems
+
+
+### Gotchas
+
+#### Manually creating views
+
+Note that the views: priority, leaders, daily_leaders, and weekly_leaders are not created in the migration script, but instead by running the queries contained in sql/views/priority.sql and sql/views/leaders.sql. This is automatically handled in the `python manage.py deploy` and `python manage.py deploy_local` commands.
+This may cause confusion if you create tables using `db.create_all()` from the shell instead of using `python manage.py deploy` (which is the best approach).
+From the `python manage.py shell` these queries can be executed with:
+
+```
+from app.queryloader import *
+query = query_loader('sql/views/priority.sql')
+db.session.execute(query)
+db.session.commit()
+```
+
+Note that `Raw.generate_fake()` will use real GOV.UK urls from the govukurls.txt.
+These entries are created by the `Raw.get_urls()` method which queries the [gov.uk/random](https://gov.uk/random) page.
+Results are stored in the govukurls.txt file and can be appended to by running the `Raw.get_urls()` method taking the number of new pages to add as the first argument.
+Note that this process can be quite slow as a 5 second gap is required between each query, in order to return a unique URL.
+
+#### Missing DEV_DATABASE_URL environment variable
 
 The following error `AttributeError: 'NoneType' object has no attribute 'drivername'` indicates that the `DEV_DATABASE_URL` environmental variable has not been set.
 
