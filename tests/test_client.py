@@ -3,6 +3,8 @@ import unittest
 from flask import url_for
 from app import create_app, db
 from app.models import User, Role
+from unittest.mock import patch
+
 
 class FlaskClientTestCase(unittest.TestCase):
     def setUp(self):
@@ -25,7 +27,11 @@ class FlaskClientTestCase(unittest.TestCase):
 #        response = self.client.get(url_for('main.index'))
 #        self.assertTrue(b'Stranger' in response.data)
 
-    def test_register_and_login(self):
+    @patch('notifications_python_client.notifications.NotificationsAPIClient.send_email_notification')
+    @patch('notifications_python_client.notifications.NotificationsAPIClient.__init__')
+    def test_register_and_login(
+            self, notify_init, notify_send_email_notification):
+        notify_init.return_value = None
         # register a new account
         response = self.client.post(url_for('auth.register'), data={
             'email': 'testemail@digital.cabinet-office.gov.uk',
