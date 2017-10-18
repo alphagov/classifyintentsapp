@@ -10,6 +10,7 @@ from app.exceptions import ValidationError
 from . import db, login_manager
 from random import choice
 
+
 class Permission:
     CLASSIFY = 0x01
     GAMIFY = 0x02
@@ -31,8 +32,7 @@ class Role(db.Model):
     def insert_roles():
         roles = {
             'User': (Permission.CLASSIFY, False),
-            'User-Gamify': (Permission.CLASSIFY | 
-                Permission.GAMIFY, False),
+            'User-Gamify': (Permission.CLASSIFY | Permission.GAMIFY, False),
             'Administrator': (0xff, False)
         }
         for r in roles:
@@ -219,15 +219,22 @@ login_manager.anonymous_user = AnonymousUser
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+
 class Classified(db.Model):
     '''A user's classification/coding of a survey'''
     __tablename__ = 'classified'
     classified_id = db.Column(db.Integer(), primary_key=True, index=True)
-    respondent_id = db.Column(db.BigInteger(), db.ForeignKey('raw.respondent_id'), index=True)
-    coder_id = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=False, index=True)
-    code_id = db.Column(db.Integer(), db.ForeignKey('codes.code_id'), nullable=False, index=True)
+    respondent_id = db.Column(
+        db.BigInteger(), db.ForeignKey('raw.respondent_id'), index=True)
+    coder_id = db.Column(
+        db.Integer(), db.ForeignKey('users.id'), nullable=False, index=True)
+    code_id = db.Column(
+        db.Integer(), db.ForeignKey('codes.code_id'), nullable=False,
+        index=True)
     # see also the backref from Raw
-    project_code_id = db.Column(db.Integer(), db.ForeignKey('project_codes.project_code_id'), index=True)
+    project_code_id = db.Column(
+        db.Integer(), db.ForeignKey('project_codes.project_code_id'),
+        index=True)
     pii = db.Column(db.Boolean(), index=True)
     date_coded = db.Column(db.DateTime(), nullable=False)
 
@@ -250,38 +257,44 @@ class Classified(db.Model):
 
         # Load codes and project codes for application to surveys
 
-        codes_query = Codes.query.filter(Codes.end_date == None).all()
-        project_codes_query = ProjectCodes.query.filter(Codes.end_date == None).all()
+        codes_query = Codes.query.filter(Codes.end_date is None).all()
+        project_codes_query = ProjectCodes.query.filter(
+            Codes.end_date is None).all()
 
         # Convert to lists
 
         c_ids = [i.code_id for i in codes_query]
         pc_ids = [i.project_code_id for i in project_codes_query]
-        
+
         # Cycle through each user and classify as a human would
 
         for j in range(user_count):
             for i in range(int(count/user_count)):
-    
-                # Choose from surveys that have not already been classified as either
-                # PII, difficult, or already classified well.
 
-                raw_query = Priority.query.filter(Priority.priority<6).first()
+                # Choose from surveys that have not already been classified as
+                # either PII, difficult, or already classified well.
+
+                raw_query = Priority.query.filter(
+                    Priority.priority < 6).first()
                 if raw_query:
                     r_id = raw_query.respondent_id
 
                     r = Classified(
-                        respondent_id = r_id,
-                        coder_id = int(choice(u_ids)),
-                        code_id = int(choice(c_ids)),
-                        project_code_id = int(choice(pc_ids)),
-                        pii = choice(a=['Yes','No'], p=[0.001, 0.999]),
-                        date_coded='{:%Y-%m-%d %H:%M:%S.%f}'.format(datetime.now())
+                        respondent_id=r_id,
+                        coder_id=int(choice(u_ids)),
+                        code_id=int(choice(c_ids)),
+                        project_code_id=int(choice(pc_ids)),
+                        pii=choice(a=['Yes', 'No'], p=[0.001, 0.999]),
+                        date_coded='{:%Y-%m-%d %H:%M:%S.%f}'.format(
+                            datetime.now())
                         )
-                else: 
+                else:
                     pass
-                    print('No surveys with the right priority remaining to be classified. Try running\
-                            Raw.generate_fake() to create more fake surveys before re-running Classified.generate_fake().')
+                    print(
+                        'No surveys with the right priority remaining to be'
+                        'classified. Try running Raw.generate_fake() to create'
+                        ' more fake surveys before re-running '
+                        'Classified.generate_fake().')
 
                 db.session.add(r)
                 try:
@@ -291,6 +304,7 @@ class Classified(db.Model):
 
     def __repr__(self):
         return '<respondent_id %s>' % self.respondent_id
+
 
 class Raw(db.Model):
     '''Represents a survey (i.e. the thing that gets classified).
@@ -304,7 +318,7 @@ class Raw(db.Model):
     start_date = db.Column(db.DateTime(), index=True)
     end_date = db.Column(db.DateTime(), index=True)
     full_url = db.Column(db.String())
-    cat_work_or_personal =  db.Column(db.String(20))  # category - work or personal
+    cat_work_or_personal = db.Column(db.String(20))  # work or personal
     comment_what_work = db.Column(db.String())
     comment_why_you_came = db.Column(db.String())
     cat_found_looking_for = db.Column(db.String(20))
@@ -315,10 +329,12 @@ class Raw(db.Model):
     comment_other_else_help = db.Column(db.String())
     comment_where_for_help = db.Column(db.String())
     comment_further_comments = db.Column(db.String())
-    classified = db.relationship('Classified', backref='surveys_classified', lazy='dynamic')
+    classified = db.relationship(
+        'Classified', backref='surveys_classified', lazy='dynamic')
 
     def __repr__(self):
-        return '<respondent_id %s start_date %s>' % (self.respondent_id, self.start_date)
+        return '<respondent_id %s start_date %s>' % (
+            self.respondent_id, self.start_date)
 
     @staticmethod
     def get_urls(count=10, file='govukurls.txt'):
@@ -364,23 +380,23 @@ class Raw(db.Model):
         seed()
         for i in range(count):
             r = Raw(
-                respondent_id = randint(10000000, 50000000),
-                collector_id = 999999,
-                start_date = forgery_py.date.date(True),
-                end_date = forgery_py.date.date(True),
-                full_url = choice(govukurls),
-                cat_work_or_personal = forgery_py.lorem_ipsum.word(),
-                comment_what_work = forgery_py.lorem_ipsum.words(3),
-                comment_why_you_came = forgery_py.lorem_ipsum.sentences(2),
-                cat_found_looking_for = choice(['Yes','No']),
-                comment_other_found_what = forgery_py.lorem_ipsum.sentences(2),
-                cat_satisfaction = choice(['Very','Not Very']),
-                comment_other_where_for_help = forgery_py.lorem_ipsum.sentences(2),
-                cat_anywhere_else_help = choice(['Yes','No']),
-                comment_other_else_help = forgery_py.lorem_ipsum.sentence(),
-                comment_where_for_help = forgery_py.lorem_ipsum.sentence(),
-                comment_further_comments = forgery_py.lorem_ipsum.sentences(3)
-                )
+                respondent_id=randint(10000000, 50000000),
+                collector_id=999999,
+                start_date=forgery_py.date.date(True),
+                end_date=forgery_py.date.date(True),
+                full_url=choice(govukurls),
+                cat_work_or_personal=forgery_py.lorem_ipsum.word(),
+                comment_what_work=forgery_py.lorem_ipsum.words(3),
+                comment_why_you_came=forgery_py.lorem_ipsum.sentences(2),
+                cat_found_looking_for=choice(['Yes','No']),
+                comment_other_found_what=forgery_py.lorem_ipsum.sentences(2),
+                cat_satisfaction=choice(['Very','Not Very']),
+                comment_other_where_for_help=forgery_py.lorem_ipsum.sentences(2),
+                cat_anywhere_else_help=choice(['Yes','No']),
+                comment_other_else_help=forgery_py.lorem_ipsum.sentence(),
+                comment_where_for_help=forgery_py.lorem_ipsum.sentence(),
+                comment_further_comments=forgery_py.lorem_ipsum.sentences(3)
+            )
 
             db.session.add(r)
             try:
@@ -390,6 +406,7 @@ class Raw(db.Model):
 
     def __repr__(self):
         return '<respondent_id %s>' % self.respondent_id
+
 
 class Codes(db.Model):
     '''A classification of the survey comment meaning
@@ -401,7 +418,8 @@ class Codes(db.Model):
     description = db.Column(db.String())
     start_date = db.Column(db.DateTime())
     end_date = db.Column(db.DateTime())
-    classified = db.relationship('Classified', backref='code_surveys', lazy='dynamic')
+    classified = db.relationship(
+        'Classified', backref='code_surveys', lazy='dynamic')
 
     def __repr__(self):
         return '<code %s code_id %s>' % (self.code, self.code_id)
@@ -435,7 +453,7 @@ class Codes(db.Model):
                 code=forgery_py.lorem_ipsum.word(),
                 description=forgery_py.lorem_ipsum.sentence(),
                 start_date=forgery_py.date.date(True),
-                end_date=choice([None,forgery_py.date.date(True)])
+                end_date=choice([None, forgery_py.date.date(True)])
                 )
 
             db.session.add(r)
@@ -456,10 +474,12 @@ class ProjectCodes(db.Model):
     description = db.Column(db.String())
     start_date = db.Column(db.DateTime())
     end_date = db.Column(db.DateTime())
-    classified = db.relationship('Classified', backref='project_surveys', lazy='dynamic')
+    classified = db.relationship(
+        'Classified', backref='project_surveys', lazy='dynamic')
 
     def __repr__(self):
-        return '<project_code %s project_code_id %s>' % (self.project_code, self.project_code_id)
+        return '<project_code %s project_code_id %s>' % (
+            self.project_code, self.project_code_id)
 
     @staticmethod
     def generate_fake(count=3):
@@ -490,7 +510,7 @@ class ProjectCodes(db.Model):
                 project_code=forgery_py.lorem_ipsum.word(),
                 description=forgery_py.lorem_ipsum.sentence(),
                 start_date=forgery_py.date.date(True),
-                end_date=choice([None,forgery_py.date.date(True)])
+                end_date=choice([None, forgery_py.date.date(True)])
                 )
 
             db.session.add(r)
@@ -498,6 +518,7 @@ class ProjectCodes(db.Model):
                 db.session.commit()
             except IntegrityError:
                 db.session.rollback()
+
 
 class Priority(db.Model):
     '''A calculated 'priority' for each survey, which determines the order that
@@ -517,7 +538,9 @@ class Priority(db.Model):
     priority = db.Column(db.Integer())
 
     def __repr__(self):
-        return '<respondent_id %s date %s priority %s vote %s>' % (self.respondent_id, self.month, self.priority, self.vote)
+        return '<respondent_id %s date %s priority %s vote %s>' % (
+            self.respondent_id, self.month, self.priority, self.vote)
+
 
 class Urls(db.Model):
     '''A page on GOV.UK, which is the context for each survey that is filled
@@ -542,7 +565,8 @@ class Urls(db.Model):
     status = db.Column(db.Integer(), index=True)
 
     def __repr__(self):
-        return '<full_url %s org %s section %s date %s >' % (self.full_url, self.org0, self.section0, self.lookup_date)
+        return '<full_url %s org %s section %s date %s >' % (
+            self.full_url, self.org0, self.section0, self.lookup_date)
 
     @staticmethod
     def bulk_lookup():
@@ -552,8 +576,8 @@ class Urls(db.Model):
         # For now, disable this, as it may be necessary to have duplicate
         # full_urls in the Urls table owing to Machinery of Govt changes.
 
-        #urls_full_urls = Urls.query.all()
-        #ulrs_full_urls = [i for i in urls_full_urls]
+        # urls_full_urls = Urls.query.all()
+        # ulrs_full_urls = [i for i in urls_full_urls]
 
         all_full_urls = Raw.query.filter_by().all()
 
@@ -575,7 +599,7 @@ class Urls(db.Model):
                 project_code=forgery_py.lorem_ipsum.word(),
                 description=forgery_py.lorem_ipsum.sentence(),
                 start_date=forgery_py.date.date(True),
-                end_date=choice([None,forgery_py.date.date(True)])
+                end_date=choice([None, forgery_py.date.date(True)])
                 )
 
             db.session.add(r)
@@ -584,17 +608,20 @@ class Urls(db.Model):
             except IntegrityError:
                 db.session.rollback()
 
+
 class Leaders(db.Model):
     __tablename__ = 'leaders'
     rank = db.Column(db.Integer(), primary_key=True)
     username = db.Column(db.String(), index=True)
     n = db.Column(db.Integer())
 
+
 class DailyLeaders(db.Model):
     __tablename__ = 'daily_leaders'
     rank = db.Column(db.Integer(), primary_key=True)
     username = db.Column(db.String(), index=True)
     n = db.Column(db.Integer())
+
 
 class WeeklyLeaders(db.Model):
     __tablename__ = 'weekly_leaders'
