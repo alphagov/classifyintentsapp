@@ -2,8 +2,8 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import DataRequired, Length, Email, Regexp, EqualTo
 from wtforms import ValidationError
-from ..models import User
 import safe
+from ..models import User
 
 
 class LoginForm(FlaskForm):
@@ -20,13 +20,13 @@ class PasswordStrength(object):
     '''
     def __init__(self, message=None):
         if not message:
-            message = 'Your password is too easy to guess. Please try again ' \
-                   'with a harder to guess password.'
+            message = ('Your password is too easy to guess. Please try again '
+                       'with a harder to guess password.')
         self.message = message
 
     def __call__(self, form, field):
-        p = field.data
-        strength = safe.check(p)
+        password = field.data
+        strength = safe.check(password)
         if strength.strength not in ['medium', 'strong']:
             raise ValidationError(self.message)
 
@@ -108,8 +108,15 @@ class PasswordResetForm(FlaskForm):
 
 
 class ChangeEmailForm(FlaskForm):
-    email = StringField('New Email', validators=[DataRequired(), Length(1, 64),
-                                                 Email()])
+    email = StringField(
+        'Email address',
+        validators=[
+            DataRequired(),
+            Length(1, 64),
+            Email(),
+            Regexp(regex=r'.*\@digital\.cabinet\-office\.gov\.uk',
+                   message='Must be a valid @digital.cabinet-office.gov.uk address')
+            ])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Update Email Address')
 
