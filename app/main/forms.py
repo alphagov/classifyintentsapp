@@ -71,14 +71,14 @@ class ClassifyForm(FlaskForm):
         # Extract codes from Postgres
         # Where there is not and end date yet
 
-        codes = Codes.query.filter(Codes.end_date is None).all()
+        codes = Codes.query.filter(Codes.end_date.is_(None)).all()
         codes_form.code.choices = [(g.code_id, g.code) for g in codes]
 
         # Extract project_codes from Postgres
         # Where there is not and end date yet
 
         project_codes = ProjectCodes.query.filter(
-            ProjectCodes.end_date is None).all()
+            ProjectCodes.end_date.is_(None)).all()
         codes_form.project_code.choices = [(i.project_code_id, i.project_code) for i in project_codes]
 
         return(codes_form)

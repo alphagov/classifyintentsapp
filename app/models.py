@@ -257,9 +257,9 @@ class Classified(db.Model):
 
         # Load codes and project codes for application to surveys
 
-        codes_query = Codes.query.filter(Codes.end_date is None).all()
+        codes_query = Codes.query.filter(Codes.end_date.is_(None)).all()
         project_codes_query = ProjectCodes.query.filter(
-            Codes.end_date is None).all()
+            Codes.end_date.is_(None)).all()
 
         # Convert to lists
 
