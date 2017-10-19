@@ -104,10 +104,6 @@ class SeleniumTestCase(unittest.TestCase):
         self.client.find_element_by_name('submit').click()
         #self.assertTrue(re.search('Which\sCODE', self.client.page_source))
     
-        # navigate to the user's profile page
-        self.client.find_element_by_link_text('Profile').click()
-        self.assertTrue('<h1>john</h1>' in self.client.page_source)
-        
         # Logout to enable next test
         self.client.find_element_by_link_text('Account').click()
         self.client.find_element_by_link_text('Log Out').click()
@@ -127,9 +123,6 @@ class SeleniumTestCase(unittest.TestCase):
         self.client.find_element_by_name('submit').click()
         #self.assertTrue(re.search('Which\sCODE', self.client.page_source))
     
-        # navigate to the user's profile page
-        self.client.find_element_by_link_text('Profile').click()
-        self.assertTrue('<h1>user</h1>' in self.client.page_source)
         self.client.find_element_by_link_text('Home').click()
         self.client.find_element_by_id('code-0').click()
         self.client.find_element_by_id('project_code-0').click()
