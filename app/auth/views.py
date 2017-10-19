@@ -82,8 +82,9 @@ def confirm(token):
 def resend_confirmation():
     token = current_user.generate_confirmation_token()
     url = url_for('auth.confirm', token=token, _external=True)
-    send_email(to=current_user.email, subject='Confirm Your Account',
-                   body=url, name=current_user.username, template='confirm')
+    send_email(
+        to=current_user.email, subject='Confirm Your Account',
+        body=url, name=current_user.username, template='confirm')
     flash('A new confirmation email has been sent to you by email.')
     return redirect(url_for('main.index'))
 
@@ -113,8 +114,9 @@ def password_reset_request():
         if user:
             token = user.generate_reset_token()
             url = url_for('auth.password_reset', token=token, _external=True)
-            send_email(to=user.email, subject='Reset Your Password',
-                      body=url, name=user.username, template='password_reset')
+            send_email(
+                to=user.email, subject='Reset Your Password',
+                body=url, name=user.username, template='password_reset')
         flash('An email with instructions to reset your password has been '
               'sent to you.')
         return redirect(url_for('auth.login'))
@@ -147,8 +149,9 @@ def change_email_request():
             new_email = form.email.data
             token = current_user.generate_email_change_token(new_email)
             url = url_for('auth.password_reset', token=token, _external=True)
-            send_email(to=new_email, subject='Change Your Email',
-                      body=url, name=current_user.email, template='change_email')
+            send_email(
+                to=new_email, subject='Change Your Email',
+                body=url, name=current_user.email, template='change_email')
             flash('An email with instructions to confirm your new email '
                   'address has been sent to you.')
             return redirect(url_for('main.index'))
