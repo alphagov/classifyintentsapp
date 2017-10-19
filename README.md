@@ -60,7 +60,7 @@ then:
 
 ```
 cd app/ # navigate to the project root
-python manage.py upgrade
+python manage.py db upgrade
 ```
 
 If you wish to populate the database with dummy data, you can also run:
