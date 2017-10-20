@@ -14,7 +14,8 @@ from random import choice
 class Permission:
     CLASSIFY = 0x01
     GAMIFY = 0x02
-    ADMINISTER = 0x80
+    ADMINISTER = 0xff
+    RETIRED = 0x00
 
 
 class Role(db.Model):
@@ -33,7 +34,8 @@ class Role(db.Model):
         roles = {
             'User': (Permission.CLASSIFY, False),
             'User-Gamify': (Permission.CLASSIFY | Permission.GAMIFY, False),
-            'Administrator': (0xff, False)
+            'Administrator': (Permission.RETIRED, False),
+            'Retired': (Permission.RETIRED, False)
         }
         for r in roles:
             role = Role.query.filter_by(name=r).first()
