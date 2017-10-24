@@ -19,6 +19,7 @@ coverage:
     - configy.py
     - manage.py
     - */__init__.py
+    - */site-packages/*
 
 comment:
   layout: "header, diff, changes"
