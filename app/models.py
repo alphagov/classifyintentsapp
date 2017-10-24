@@ -34,7 +34,7 @@ class Role(db.Model):
         roles = {
             'User': (Permission.CLASSIFY, False),
             'User-Gamify': (Permission.CLASSIFY | Permission.GAMIFY, False),
-            'Administrator': (Permission.RETIRED, False),
+            'Administrator': (Permission.ADMINISTER, False),
             'Retired': (Permission.RETIRED, False)
         }
         for r in roles:
