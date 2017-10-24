@@ -8,7 +8,7 @@ create view leaders as (
         from Classified 
         left join users
         on users.id=classified.coder_id
-        where users.role_id != (select id from roles where roles.name = 'User')
+        where users.role_id not in (select id from roles where roles.name in ('User','Retired'))
         group by coder_id
     )
     select row_number() over (order by cte.n desc) as rank, users.username, cte.n 
@@ -23,7 +23,7 @@ create view daily_leaders as (
     from classified 
     left join users
     on users.id=classified.coder_id
-    where users.role_id != (select id from roles where roles.name = 'User')
+    where users.role_id not in (select id from roles where roles.name in ('User','Retired'))
     and date_coded > (select date_trunc('day', now()))
     group by coder_id
     )
@@ -39,7 +39,7 @@ create view weekly_leaders as (
     from classified 
     left join users
     on users.id=classified.coder_id
-    where users.role_id != (select id from roles where roles.name = 'User')
+    where users.role_id not in (select id from roles where roles.name in ('User','Retired'))
     and date_coded > (select date_trunc('week', now()) -INTERVAL '1 day')
     group by coder_id
     )

@@ -1,9 +1,18 @@
 #!/usr/bin/env python
 import os
+import coverage
+import sys
+import unittest
+from flask_migrate import upgrade, Migrate, MigrateCommand
+from app.queryloader import query_loader
+from app import create_app, db
+from app.models import (User, Role, Permission, Codes, Raw, ProjectCodes, 
+        Classified, Priority, Urls)
+from flask_script import Manager, Shell
+from werkzeug.contrib.profiler import ProfilerMiddleware
 
 COV = None
 if os.environ.get('FLASK_COVERAGE'):
-    import coverage
     COV = coverage.coverage(branch=True, include='app/*')
     COV.start()
 
@@ -14,10 +23,6 @@ if os.path.exists('.env'):
         if len(var) == 2:
             os.environ[var[0]] = var[1]
 
-from app import create_app, db
-from app.models import User, Role, Permission, Codes, Raw, ProjectCodes, Classified, Priority, Urls
-from flask_script import Manager, Shell
-from flask_migrate import Migrate, MigrateCommand
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 manager = Manager(app)
@@ -47,10 +52,8 @@ manager.add_command('db', MigrateCommand)
 def test(coverage=False):
     """Run the unit tests."""
     if coverage and not os.environ.get('FLASK_COVERAGE'):
-        import sys
         os.environ['FLASK_COVERAGE'] = '1'
         os.execvp(sys.executable, [sys.executable] + sys.argv)
-    import unittest
     tests = unittest.TestLoader().discover('tests')
     result = unittest.TextTestRunner(verbosity=2).run(tests)
     if not result.wasSuccessful():
@@ -69,7 +72,6 @@ def test(coverage=False):
 @manager.command
 def profile(length=25, profile_dir=None):
     """Start the application under the code profiler."""
-    from werkzeug.contrib.profiler import ProfilerMiddleware
     app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[length],
                                       profile_dir=profile_dir)
     app.run()
@@ -84,11 +86,7 @@ def deploy_local():
 @manager.command
 def deploy():
     """Run deployment tasks."""
-    from flask_migrate import upgrade
-    from app.models import Role, User
-    from app.queryloader import query_loader
     # migrate database to latest revision
-
     upgrade()
 
     # create user roles
@@ -106,16 +104,11 @@ def deploy():
 @manager.command
 def populate():
     """Populate database with fake data."""
-    from flask_migrate import upgrade
-    from app.models import Role, User, Codes, ProjectCodes, Classified
-    # migrate database to latest revision
 
-    # create user roles
     Raw.generate_fake(1000)
     Codes.generate_fake()
     ProjectCodes.generate_fake()
     User.generate_fake(10)
-
     Classified.generate_fake(500, 10)
 
 if __name__ == '__main__':
