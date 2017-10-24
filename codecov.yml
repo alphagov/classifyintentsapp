@@ -1,27 +1,15 @@
-    i
-# This file represents the default values when a customer has not filled them out
-coverage:
-  precision: 2
-  round: down
-  range: "70...100"
-  notify:
-    require_ci_to_pass: yes
-
-  status:
-    project: yes
-
-    patch: yes
-
-    changes: yes
-
-  ignore: # files and folders for processing
-    - tests/*
-    - configy.py
-    - manage.py
-    - */__init__.py
-    - */site-packages/*
+codecov:
+    notify:
+        require_ci_to_pass: no
 
 comment:
-  layout: "header, diff, changes"
-  behavior: default
+    layout: header, changes, diff
+
+coverage:
+    ignore:
+        - tests/*
+        - config.py
+        - manage.py
+        - */__init__.py
+        - */site-packages/*
   
