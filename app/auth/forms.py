@@ -1,15 +1,27 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import DataRequired, Length, Email, Regexp, EqualTo
+from wtforms.widgets import PasswordInput
 from wtforms import ValidationError
 import safe
 from ..models import User
 
 
+class PasswordWidget(PasswordInput):
+    '''
+    Custom password field widget, but with autocomplete="off" by default.
+    '''
+    def __call__(self, field, **kwargs):
+        if "autocomplete" not in kwargs:
+            kwargs['autocomplete'] = 'off'
+        return super(PasswordWidget, self).__call__(field, **kwargs)
+
+
 class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Length(1, 64),
                                              Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()],
+                             widget=PasswordWidget())
     remember_me = BooleanField('Keep me logged in')
     submit = SubmitField('Log In')
 
@@ -60,8 +72,10 @@ class RegistrationForm(FlaskForm):
         Length(
             min=8,
             message='Password must be at least 8 characters in length.'),
-        PasswordStrength()])
-    password2 = PasswordField('Confirm password', validators=[DataRequired()])
+        PasswordStrength()],
+        widget=PasswordWidget())
+    password2 = PasswordField('Confirm password', validators=[DataRequired()],
+                              widget=PasswordWidget())
     submit = SubmitField('Register')
 
     def validate_email(self, field):
@@ -74,8 +88,11 @@ class RegistrationForm(FlaskForm):
 
 
 class ChangePasswordForm(FlaskForm):
-    old_password = PasswordField('Old password', validators=[DataRequired()])
-    password = PasswordField('New password', validators=[
+    old_password = PasswordField('Old password', validators=[DataRequired()],
+                                 widget=PasswordWidget())
+    password = PasswordField('New password',
+                             widget=PasswordWidget(),
+                             validators=[
         DataRequired(),
         EqualTo('password2', message='Passwords must match.'),
         Length(
@@ -83,7 +100,8 @@ class ChangePasswordForm(FlaskForm):
         PasswordStrength()
         ])
     password2 = PasswordField(
-        'Confirm new password', validators=[DataRequired()])
+        'Confirm new password', validators=[DataRequired()],
+        widget=PasswordWidget())
     submit = SubmitField('Update Password')
 
 
@@ -96,10 +114,12 @@ class PasswordResetRequestForm(FlaskForm):
 class PasswordResetForm(FlaskForm):
     email = StringField('Email', validators=[
         DataRequired(), Length(1, 64), Email()])
-    password = PasswordField('New Password', validators=[
+    password = PasswordField('New Password', widget=PasswordWidget(),
+                             validators=[
         DataRequired(), EqualTo('password2', message='Passwords must match'),
         PasswordStrength()])
-    password2 = PasswordField('Confirm password', validators=[DataRequired()])
+    password2 = PasswordField('Confirm password', validators=[DataRequired()],
+                              widget=PasswordWidget())
     submit = SubmitField('Reset Password')
 
     def validate_email(self, field):
@@ -117,7 +137,8 @@ class ChangeEmailForm(FlaskForm):
             Regexp(regex=r'.*\@digital\.cabinet\-office\.gov\.uk',
                    message='Must be a valid @digital.cabinet-office.gov.uk address')
             ])
-    password = PasswordField('Password', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()],
+                             widget=PasswordWidget())
     submit = SubmitField('Update Email Address')
 
     def validate_email(self, field):
