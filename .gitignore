@@ -53,6 +53,5 @@ pyvenv.cfg
 share
 
 # CloudFoundry
-.cfignore
 manifest.yml
 *.sh
