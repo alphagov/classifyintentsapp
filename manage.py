@@ -6,7 +6,7 @@ import unittest
 from flask_migrate import upgrade, Migrate, MigrateCommand
 from app.queryloader import query_loader
 from app import create_app, db
-from app.models import (User, Role, Permission, Codes, Raw, ProjectCodes, 
+from app.models import (User, Role, Permission, Codes, Raw, ProjectCodes,
         Classified, Priority, Urls)
 from flask_script import Manager, Shell
 from werkzeug.contrib.profiler import ProfilerMiddleware

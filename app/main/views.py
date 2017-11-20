@@ -79,7 +79,7 @@ def index():
     # While loop keeps running until a survey
     # is found that the user has not yet seen.
 
-    priority = new_survey(current_user.id, Priority)    
+    priority = new_survey(current_user.id, Priority)
 
     # Check that there are some entries returned if not
     # Redirect to 'All done page'
@@ -150,6 +150,11 @@ def user(username):
 
 
 @main.route('/edit-profile/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_profile(id):
+    raise NotImplementedError()
+
+@main.route('/edit-profile-admin/<int:id>', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def edit_profile_admin(id):

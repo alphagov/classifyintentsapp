@@ -22,6 +22,13 @@ def create_app(config_name):
     config[config_name].init_app(app)
 
     bootstrap.init_app(app)
+
+    # Set jquery version
+    from flask_bootstrap import WebCDN
+    app.extensions['bootstrap']['cdns']['jquery'] = WebCDN(
+        '//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/'
+    )
+
     moment.init_app(app)
     db.init_app(app)
     login_manager.init_app(app)
@@ -36,5 +43,14 @@ def create_app(config_name):
 
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
+
+    # Tell browser not to cache any HTML responses, as most pages have
+    # sensitive information in them. (But CSS should be cached as normal.)
+    @app.after_request
+    def apply_caching(response):
+        if response.headers.get('Content-Type', '').startswith('text/html'):
+            response.headers['Cache-control'] = 'no-store'
+            response.headers['Pragma'] = 'no-cache'
+        return response
 
     return app
