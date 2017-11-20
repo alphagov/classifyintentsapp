@@ -79,7 +79,7 @@ def index():
     # While loop keeps running until a survey
     # is found that the user has not yet seen.
 
-    priority = new_survey(current_user.id, Priority)    
+    priority = new_survey(current_user.id, Priority)
 
     # Check that there are some entries returned if not
     # Redirect to 'All done page'
