@@ -12,9 +12,70 @@ The underlying framework of the app is based heavily on the micro blogging site 
 
 ## Getting started
 
+### Deploying locally
+
+```
+git clone git@github.com:ukgovdatascience/classifyintentsapp.git
+cd classifyintentsapp
+```
+
+Configure the app by creating a `.env` file in the classifyintentsapp directory:
+```
+DATABASE_URL=postgres://USER@localhost:5432/classifyintentsapp
+DEV_DATABASE_URL=postgres://USER@localhost:5432/classifyintentsapp-dev
+TEST_DATABASE_URL=postgres://USER@localhost:5432/classifyintentsapp-test
+FLASKY_ADMIN=username@domain.com
+SECRET_KEY=key-to-prevent_csrf
+FLASK_CONFIG=development
+NOTIFY_API_KEY=govuk-notify-api-key
+```
+and edit:
+
+* USER to your local machine's login name
+* FLASKY_ADMIN to be your email address (for exception emails and signifying the admin account)
+* NOTIFY_API_KEY to be your notify API key
+
+```
+mkvirtualenv classifyintentsapp
+pip install -r requirements.txt
+```
+
+Install PostgreSQL. On OSX it may be convenient to use the [Postgres.app](https://postgresapp.com/). Now create the databases:
+```
+createdb classifyintentsapp-dev
+createdb classifyintentsapp-test
+createdb classifyintentsapp
+```
+
+Setup the classifyintentsapp-dev database and add dummy data:
+```
+python manage.py deploy_local
+```
+
+Create an admin account:
+```
+python manage.py shell
+```
+Then:
+```
+from app.models import User, Role
+admin_id = Role.query.filter(Role.name=='Administrator').with_entities(Role.id).scalar()
+u = User(username='admin', email='admin@admin.com', password='pass', role=Role.query.get(admin_id), confirmed=True)
+db.session.add(u)
+db.session.commit()
+```
+
+Start the app:
+```
+python manage.py runserver
+```
+Open in a browser [http://127.0.0.1:5000/](http://127.0.0.1:5000/)
+Login as: `admin@admin.com` password: `pass`
+
+
 ### Deploying the app onto PaaS
 
-To deploy manually on PaaS, navigate to the root of the project and run. Note that the .cfignore file mirrors the .gitignore file, so any files you wish to exclude from being pushed onto the PaaS instance should be added to the 
+To deploy manually on PaaS, navigate to the root of the project and run. Note that the .cfignore file mirrors the .gitignore file, so any files you wish to exclude from being pushed onto the PaaS instance should be added to the .gitignore.
 
 ```
 cf push
@@ -31,15 +92,18 @@ applications:
     DATABASE_URL: postgres://username:password@host:port/database
     DEV_DATABASE_URL: postgres://username:password@host:port/database
     TEST_DATABASE_URL: postgres://username:password@host:port/database
-    FLASKY_ADMIN: username@domain.com 
+    FLASKY_ADMIN: username@domain.com
     SECRET_KEY: key-to-prevent_csrf
     FLASK_CONFIG: production
     NOTIFY_API_KEY: govuk-notify-api-key
 ---
 
 ```
+SECRET_KEY should be a random string - create using:
+```
+python -c 'import random, string; print("".join([random.SystemRandom().choice("{}{}".format(string.ascii_letters, string.digits)) for i in range(50)]))'
+```
 
-If you are running a server locally, these environment variables should be set in a `.env` file (and ideally managed using [autoenv](https://github.com/kennethreitz/autoenv) or similar). You will probably want to set the `FLASK_CONFIG` variable to `development`.
 
 #### Setting up the database
 
@@ -80,9 +144,9 @@ and accessed at `https://127.0.0.1:5000`.
 
 #### Getting admin access to the application
 
-Ensure that you have specified your email address in the `FLASKY_ADMIN` environment variable, and then register with the application using the registration page.
-You will automatically be granted administrator rights to the web application.
-If you are running the server without access to notify, you will need to create a user manually. Open a shell:
+Ensure that you have specified your email address in the `FLASKY_ADMIN` environment variable, and then register with the application using the registration page. You will automatically be granted administrator rights to the web application.
+
+If you are running the server without access to Notify, you will need to create a user manually. Open a shell:
 
 ```
 python manage.py shell
@@ -100,7 +164,7 @@ db.session.commit()
 
 ### Generating dummy data
 
-Dummy data is generated as part of the `python manage.py deploy_local` command, but these methods can be run independent of `python manage.py deploy_local` by runnign `python manage.py populate`, or by opening an app specific shell with `python manage.py shell`, and executing the commands:
+Dummy data is generated as part of the `python manage.py deploy_local` command, but these methods can be run independent of `python manage.py deploy_local` by running `python manage.py populate`, or by opening an app specific shell with `python manage.py shell`, and executing the commands:
 
 ```
 Role.insert_roles()
@@ -121,7 +185,7 @@ When hosting databases on GOV.UK PaaS, it is not possible to make a direct conne
 To see the details of the postgres database run:
 
 ```
-cf env APP_NAME 
+cf env APP_NAME
 ```
 which will return a json containing the server configuration.
 
@@ -131,7 +195,7 @@ To create an SSH tunnel via the instance running the web application run:
 cf ssh classifyapp -L 6666:HOST:PORT
 ```
 
-In a new terminal window then run: 
+In a new terminal window then run:
 
 ```
 psql postgres://USERNAME:PASSWORD@localhost:6666/DATABASE_NAME
@@ -194,4 +258,3 @@ Note that this process can be quite slow as a 5 second gap is required between e
 #### Missing DEV_DATABASE_URL environment variable
 
 The following error `AttributeError: 'NoneType' object has no attribute 'drivername'` indicates that the `DEV_DATABASE_URL` environmental variable has not been set.
-
