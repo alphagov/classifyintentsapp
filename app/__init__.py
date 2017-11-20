@@ -37,4 +37,13 @@ def create_app(config_name):
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
 
+    # Tell browser not to cache any HTML responses, as most pages have
+    # sensitive information in them. (But CSS should be cached as normal.)
+    @app.after_request
+    def apply_caching(response):
+        if response.headers.get('Content-Type', '').startswith('text/html'):
+            response.headers['Cache-control'] = 'no-store'
+            response.headers['Pragma'] = 'no-cache'
+        return response
+
     return app
