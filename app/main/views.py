@@ -151,6 +151,11 @@ def user(username):
 
 @main.route('/edit-profile/<int:id>', methods=['GET', 'POST'])
 @login_required
+def edit_profile(id):
+    raise NotImplementedError()
+
+@main.route('/edit-profile-admin/<int:id>', methods=['GET', 'POST'])
+@login_required
 @admin_required
 def edit_profile_admin(id):
     user = User.query.get_or_404(id)
