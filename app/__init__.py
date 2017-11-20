@@ -22,6 +22,13 @@ def create_app(config_name):
     config[config_name].init_app(app)
 
     bootstrap.init_app(app)
+
+    # Set jquery version
+    from flask_bootstrap import WebCDN
+    app.extensions['bootstrap']['cdns']['jquery'] = WebCDN(
+        '//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/'
+    )
+
     moment.init_app(app)
     db.init_app(app)
     login_manager.init_app(app)
