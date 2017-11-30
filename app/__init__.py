@@ -4,7 +4,6 @@ from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_pagedown import PageDown
-from config import config
 
 bootstrap = Bootstrap()
 moment = Moment()
@@ -18,6 +17,9 @@ login_manager.login_view = 'auth.login'
 
 def create_app(config_name):
     app = Flask(__name__)
+    # import config here rather than at module level to ensure that .env values
+    # are loaded into the environment first when running manage.py
+    from config import config
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
 
