@@ -1,12 +1,12 @@
-[![Build Status](https://travis-ci.org/ukgovdatascience/classifyintentsapp.svg?branch=master)](https://travis-ci.org/ukgovdatascience/classifyintentsapp)
-[![codecov](https://codecov.io/gh/ukgovdatascience/classifyintentsapp/branch/master/graph/badge.svg)](https://codecov.io/gh/ukgovdatascience/classifyintentsapp)
+[![Build Status](https://travis-ci.org/alphagov/classifyintentsapp.svg?branch=master)](https://travis-ci.org/alphagov/classifyintentsapp)
+[![codecov](https://codecov.io/gh/alphagov/classifyintentsapp/branch/master/graph/badge.svg)](https://codecov.io/gh/alphagov/classifyintentsapp)
 
 # Classify intents survey web app
 
 This repository contains a Flask app designed to improve the process of classifying surveys received in the GOV.UK intents survey.
 The application is hosted on [GOV.UK PaaS](https://www.cloud.service.gov.uk/).
 
-A blog about the GOV.UK intent survey is available on [gov.uk](https://gdsdata.blog.gov.uk/2016/12/20/using-machine-learning-to-classify-user-comments-on-gov-uk/), whilst the code is available as a [python package](https://github.com/ukgovdatascience/classifyintents) and [supporting scripts](https://github.com/ukgovdatascience/classifyintentspipe).
+A blog about the GOV.UK intent survey is available on [gov.uk](https://gdsdata.blog.gov.uk/2016/12/20/using-machine-learning-to-classify-user-comments-on-gov-uk/), whilst the code is available as a [python package](https://github.com/alphagov/classifyintents) and [supporting scripts](https://github.com/alphagov/classifyintentspipe).
 
 The underlying framework of the app is based heavily on the micro blogging site by [Miguel Grinberg](https://github.com/miguelgrinberg/flasky) which features in the O'Reilly book [Flask Web Development](http://www.flaskbook.com).
 
@@ -15,7 +15,7 @@ The underlying framework of the app is based heavily on the micro blogging site 
 ### Deploying locally
 
 ```
-git clone git@github.com:ukgovdatascience/classifyintentsapp.git
+git clone git@github.com:alphagov/classifyintentsapp.git
 cd classifyintentsapp
 ```
 
